@@ -1,0 +1,59 @@
+# Dependency directories
+node_modules/
+venv/
+env/
+ENV/
+bin/
+lib/
+include/
+
+# Python: Compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Python: Distribution / packaging
+dist/
+build/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Node.js: Build and distribution
+dist/
+build/
+out/
+.next/
+.nuxt/
+
+# Environment variables and secrets
+.env
+.env.local
+.env.*.local
+*.env
+.venv
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Testing and Coverage
+.pytest_cache/
+.tox/
+.coverage
+htmlcov/
+.nyc_output
+
+# Editor/OS Specific
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+
+# other specific files
+features.md
+todo.md
