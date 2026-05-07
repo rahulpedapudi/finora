@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from app.api.routes import expenses
 from app.api.routes import auth
 from app.api.routes import profile
@@ -12,6 +13,15 @@ from app.models.budget import Budget
 
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    # Allows specific origins (use ["*"] for all)
+    allow_origins=["*"],
+    allow_credentials=True,           # Allows cookies and authentication headers
+    # Allows all HTTP methods (GET, POST, etc.)
+    allow_methods=["*"],
+    allow_headers=["*"],              # Allows all headers
+)
 
 Base.metadata.create_all(bind=engine)
 
