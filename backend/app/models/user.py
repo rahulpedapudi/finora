@@ -19,6 +19,6 @@ class User(Base):
     password_hash = Column(String)
     created_at = Column(DateTime, default=datetime.now(UTC))
 
-    expenses = relationship("Expense", back_populates="user")
+    transactions = relationship("Transaction", back_populates="user")
     categories = relationship("Category", back_populates="user")
     budgets = relationship("Budget", back_populates="user")

@@ -25,7 +25,7 @@ def login(user_data: LoginRequest, response: Response, db: Session = Depends(get
     tokens = login_user(user_data, db)
 
     if not tokens:
-        raise HTTPException(status_code = 401, detail="Invalid Credentials")
+        raise HTTPException(status_code=401, detail="Invalid Credentials")
 
     response.set_cookie(
         key="access_token",

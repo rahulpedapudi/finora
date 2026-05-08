@@ -25,5 +25,5 @@ class Category(Base):
     created_at = Column(DateTime, default=datetime.now(UTC))
 
     user = relationship("User", back_populates="categories")
-    expenses = relationship("Expense", back_populates="category")
+    transactions = relationship("Transaction", back_populates="category")
     budgets = relationship("Budget", back_populates="category")

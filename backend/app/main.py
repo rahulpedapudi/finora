@@ -1,13 +1,14 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api.routes import expenses
+from app.api.routes import transactions
 from app.api.routes import auth
 from app.api.routes import profile
+from app.api.routes import categories
 
 from app.db.database import Base, engine
 
 from app.models.user import User
-from app.models.expense import Expense
+from app.models.transaction import Transaction
 from app.models.category import Category
 from app.models.budget import Budget
 
@@ -26,9 +27,9 @@ app.add_middleware(
 Base.metadata.create_all(bind=engine)
 
 app.include_router(
-    router=expenses.router,
-    prefix="/expenses",
-    tags=["Expenses"]
+    router=transactions.router,
+    prefix="/transactions",
+    tags=["Transactions"]
 )
 
 app.include_router(
@@ -41,6 +42,12 @@ app.include_router(
     router=profile.router,
     prefix="/profile",
     tags=["Profile"]
+)
+
+app.include_router(
+    router=categories.router,
+    prefix="/category",
+    tags=["Categories"]
 )
 
 

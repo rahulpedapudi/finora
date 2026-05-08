@@ -11,7 +11,7 @@ from app.models.user import User
 from app.core.security import verify_token
 
 
-def current_user(request: Request, db: Session = Depends(get_db)):
+def get_current_user(request: Request, db: Session = Depends(get_db)):
     access_token = request.cookies.get("access_token")
 
     if not access_token:

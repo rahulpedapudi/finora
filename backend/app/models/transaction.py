@@ -6,8 +6,8 @@ from datetime import datetime, UTC
 import uuid
 
 
-class Expense(Base):
-    __tablename__ = "expenses"
+class Transaction(Base):
+    __tablename__ = "transactions"
 
     id = Column(
         UUID(as_uuid=True),
@@ -27,9 +27,17 @@ class Expense(Base):
         nullable=False
     )
 
+    raw_input = Column(String, nullable=False)
+
+    title = Column(String, nullable=False)
+
+    note = Column(String, nullable=False)
+
     amount = Column(
         Numeric(10, 2), nullable=False
     )
+
+    type = Column(String, nullable=False)
 
     merchant = Column(
         String, nullable=False
@@ -47,5 +55,5 @@ class Expense(Base):
         DateTime, default=datetime.now(UTC)
     )
 
-    user = relationship("User", back_populates="expenses")
-    category = relationship("Category", back_populates="expenses")
+    user = relationship("User", back_populates="transactions")
+    category = relationship("Category", back_populates="transactions")
