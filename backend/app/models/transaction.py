@@ -23,24 +23,24 @@ class Transaction(Base):
 
     category_id = Column(
         UUID(as_uuid=True),
-        ForeignKey("categories.id"),
-        nullable=False
+        ForeignKey("categories.id", ondelete="SET NULL", ),
+        nullable=True
     )
 
-    raw_input = Column(String, nullable=False)
+    raw_input = Column(String, nullable=True)
 
-    title = Column(String, nullable=False)
+    title = Column(String, nullable=True)
 
-    note = Column(String, nullable=False)
+    note = Column(String, nullable=True)
 
     amount = Column(
-        Numeric(10, 2), nullable=False
+        Numeric(10, 2), nullable=True
     )
 
-    type = Column(String, nullable=False)
+    type = Column(String, nullable=True)
 
     merchant = Column(
-        String, nullable=False
+        String, nullable=True
     )
 
     date = Column(
@@ -48,7 +48,7 @@ class Transaction(Base):
     )
 
     payment_method = Column(
-        String, nullable=False
+        String, nullable=True
     )
 
     created_at = Column(

@@ -1,29 +1,130 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from decimal import Decimal
 from datetime import datetime
 from uuid import UUID
+from enum import Enum
+from typing import Optional
 
 
-class TransactionBase(BaseModel):
-    raw_input: str
-    title: str | None = None
-    amount: Decimal | None = None
-    type: str
-    note: str | None = None
-    category_id: UUID
+class TransactionType(str, Enum):
+    expense = "expense"
+    income = "income"
+
+
+class ParsedTransaction(BaseModel):
+    amount: Decimal
+    type: TransactionType
+
     merchant: str | None = None
+    title: str | None = None
+
+
+class TransactionCreate(BaseModel):
+    """
+    Minimal input from frontend.
+
+    User should ideally send:
+    {
+        "raw_input": "250 swiggy"
+    }
+
+    Optional overrides are allowed.
+    """
+
+    raw_input: str = Field(
+        min_length=1,
+        max_length=255
+    )
+
+    category_id: UUID | None = None
+
+    title: str | None = Field(
+        default=None,
+        max_length=100
+    )
+
+    amount: Decimal | None = None
+
+    type: TransactionType | None = None
+
+    merchant: str | None = Field(
+        default=None,
+        max_length=100
+    )
+
+    payment_method: str | None = Field(
+        default=None,
+        max_length=50
+    )
+
+    note: str | None = Field(
+        default=None,
+        max_length=500
+    )
+
+    date: datetime | None = None
+
+
+class TransactionResponse(BaseModel):
+    id: UUID
+
+    user_id: UUID
+
+    raw_input: str
+
+    amount: Decimal
+
+    type: TransactionType
+
+    category_id: UUID | None = None
+
+    title: str | None = None
+
+    merchant: str | None = None
+
     payment_method: str | None = None
+
+    note: str | None = None
+
     date: datetime
 
-
-class TransactionCreate(TransactionBase):
-    user_id: UUID
-
-
-class TransactionResponse(TransactionBase):
-    id: UUID
-    user_id: UUID
     created_at: datetime
 
     class Config:
         from_attributes = True
+
+
+class TransactionUpdate(BaseModel):
+    # raw_input field shouldnt editable, user can edit only the parsed transaction, with title, note, amount etc.
+    raw_input: Optional[str] = Field(
+        min_length=0,
+        max_length=255
+    )
+
+    category_id: Optional[UUID] | None = None
+
+    title: Optional[str] | None = Field(
+        default=None,
+        max_length=100
+    )
+
+    amount: Optional[Decimal] | None = None
+
+    type: Optional[TransactionType] | None = None
+
+    merchant: Optional[str] | None = Field(
+        default=None,
+        max_length=100
+    )
+
+    payment_method: Optional[str] | None = Field(
+        default=None,
+        max_length=50
+    )
+
+    note: Optional[str] | None = Field(
+        default=None,
+        max_length=500
+    )
+
+    date: Optional[datetime] | None = None

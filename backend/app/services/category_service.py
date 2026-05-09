@@ -29,3 +29,35 @@ def create_category(data: CategoryCreate, db: Session, current_user: User):
 def get_categories(db: Session, user: User):
     categories = db.query(Category).filter(Category.user_id == user.id).all()
     return categories
+
+
+def remove_category(cat_id, db: Session, user: User):
+    cat = db.query(Category).filter(
+        Category.user_id == user.id, Category.id == cat_id).first()
+
+    if not cat:
+        raise HTTPException(detail="Category not found", status_code=404)
+
+    db.delete(cat)
+    db.commit()
+
+    return cat
+
+
+def patch_category(cat_id, data: CategoryCreate, db: Session, user: User):
+    cat = db.query(Category).filter(
+        Category.user_id == user.id, Category.id == cat_id).first()
+
+    if not cat:
+        raise HTTPException(detail="Category not found", status_code=404)
+
+    update_data = data.model_dump(exclude_unset=True)
+
+    for key, value in update_data.items():
+        setattr(cat, key, value)
+
+    db.add(cat)
+    db.commit()
+    db.refresh(cat)
+
+    return cat

@@ -23,3 +23,15 @@ def add_category(data: CategoryCreate, db: Session = Depends(get_db), current_us
 def get_categories(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     categories = category_service.get_categories(db, user)
     return categories
+
+
+@router.delete("/{cat_id}")
+def delete_category(cat_id, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    category_service.remove_category(cat_id, db, current_user)
+    return {f"message: {cat_id} deleted successfully"}
+
+
+@router.patch("/{cat_id}", response_model=CategoryResponse)
+def edit_category(cat_id, data: CategoryCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    cat = category_service.patch_category(cat_id, data, db, current_user)
+    return cat
