@@ -1,10 +1,12 @@
 from fastapi import APIRouter, Depends
-from app.schemas.transaction import TransactionCreate, TransactionResponse, TransactionUpdate
+from app.schemas.transaction import TransactionCreate, TransactionResponse, TransactionUpdate, TransactionSearch
 from app.db.database import get_db
 from app.services import transaction_service
 from app.models.user import User
 from app.core.dependencies import get_current_user
 from sqlalchemy.orm import Session
+
+from decimal import Decimal
 
 
 router = APIRouter()
@@ -38,3 +40,14 @@ def edit_transaction(txn_id, data: TransactionUpdate, db: Session = Depends(get_
     txn = transaction_service.patch_transaction(txn_id, data, db, current_user)
 
     return txn
+
+
+@router.get("/search", response_model=list[TransactionResponse])
+def search(
+        search_data: TransactionSearch = Depends(),
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user)
+):
+    txns = transaction_service.search_transactions(
+        search_data, db, current_user)
+    return txns

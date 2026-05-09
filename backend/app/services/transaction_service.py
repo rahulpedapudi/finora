@@ -1,7 +1,9 @@
 from app.models.user import User
 from sqlalchemy.orm import Session
+from sqlalchemy import or_
 from app.models.transaction import Transaction
-from app.schemas.transaction import TransactionCreate
+from app.models.category import Category
+from app.schemas.transaction import TransactionCreate, TransactionSearch
 from app.services.parsing_service import parse_transaction_input
 from datetime import datetime, UTC
 from fastapi import HTTPException
@@ -77,3 +79,41 @@ def patch_transaction(txn_id, data, db: Session, user: User):
     db.refresh(txn)
 
     return txn
+
+
+def search_transactions(data: TransactionSearch, db: Session, user: User):
+    txns = db.query(Transaction).filter(Transaction.user_id == user.id)
+
+    if data.query:
+        search_query = f"%{data.query.lower()}%"
+        txns = txns.filter(or_(
+            Transaction.raw_input.ilike(search_query),
+            Transaction.title.ilike(search_query),
+            Transaction.note.ilike(search_query),
+            Transaction.merchant.ilike(search_query)
+
+        ))
+
+    if data.category:
+        txns = txns.join(Transaction.category).filter(
+            Category.name.ilike(f"%{data.category}%")
+        )
+
+    if data.type:
+        txns = txns.filter(
+            Transaction.type.ilike(f"%{data.type}%")
+        )
+
+    if data.min_amount:
+        txns = txns.filter(
+            Transaction.amount >= data.min_amount
+        )
+
+    if data.max_amount:
+        txns = txns.filter(
+            Transaction.amount <= data.max_amount
+        )
+
+    return (
+        txns.order_by(Transaction.date.desc()).all()
+    )

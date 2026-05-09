@@ -11,6 +11,14 @@ class TransactionType(str, Enum):
     income = "income"
 
 
+class TransactionSearch(BaseModel):
+    query: str | None = None
+    category: str | None = None
+    type: TransactionType | None = None
+    min_amount: Decimal | None = None
+    max_amount: Decimal | None = None
+
+
 class ParsedTransaction(BaseModel):
     amount: Decimal
     type: TransactionType
