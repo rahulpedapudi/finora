@@ -1,8 +1,8 @@
 from app.db.database import Base
-from sqlalchemy import Column, Numeric, String, DateTime, ForeignKey
+from sqlalchemy import Column, Numeric, String, DateTime, ForeignKey, Date
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
-from datetime import datetime, UTC
+from datetime import datetime, UTC, date
 import uuid
 
 
@@ -43,8 +43,8 @@ class Transaction(Base):
         String, nullable=True
     )
 
-    date = Column(
-        DateTime
+    date_of_transaction = Column(
+        Date
     )
 
     payment_method = Column(
@@ -52,7 +52,7 @@ class Transaction(Base):
     )
 
     created_at = Column(
-        DateTime, default=datetime.now(UTC)
+        DateTime(timezone=True), default=lambda: datetime.now(UTC)
     )
 
     user = relationship("User", back_populates="transactions")

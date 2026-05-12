@@ -5,7 +5,7 @@ from app.models.transaction import Transaction
 from app.models.category import Category
 from app.schemas.transaction import TransactionCreate, TransactionSearch
 from app.services.parsing_service import parse_transaction_input
-from datetime import datetime, UTC
+from datetime import datetime, UTC, date
 from fastapi import HTTPException
 
 
@@ -33,7 +33,7 @@ def create_transaction(data: TransactionCreate, db: Session, user: User):
 
         payment_method="expense",
 
-        date=data.date or datetime.now(UTC)
+        date_of_transaction=data.date_of_transaction or date.today()
     )
     db.add(txn)
     db.commit()
@@ -114,6 +114,21 @@ def search_transactions(data: TransactionSearch, db: Session, user: User):
             Transaction.amount <= data.max_amount
         )
 
+    if data.txn_on:
+        txns = txns.filter(
+            Transaction.date_of_transaction == data.txn_on
+        )
+
+    if data.txn_from:
+        txns = txns.filter(
+            Transaction.date_of_transaction >= data.txn_from
+        )
+
+    if data.txn_to:
+        txns = txns.filter(
+            Transaction.date_of_transaction <= data.txn_to
+        )
+
     return (
-        txns.order_by(Transaction.date.desc()).all()
+        txns.order_by(Transaction.date_of_transaction.desc()).all()
     )

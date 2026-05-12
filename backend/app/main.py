@@ -4,6 +4,7 @@ from app.api.routes import transactions
 from app.api.routes import auth
 from app.api.routes import profile
 from app.api.routes import categories
+from app.api.routes import analytics
 
 from app.db.database import Base, engine
 
@@ -18,37 +19,30 @@ app.add_middleware(
     CORSMiddleware,
     # Allows specific origins (use ["*"] for all)
     allow_origins=["*"],
-    allow_credentials=True,           # Allows cookies and authentication headers
+    allow_credentials=True,  # Allows cookies and authentication headers
     # Allows all HTTP methods (GET, POST, etc.)
     allow_methods=["*"],
-    allow_headers=["*"],              # Allows all headers
+    allow_headers=["*"],  # Allows all headers
 )
 
 Base.metadata.create_all(bind=engine)
 
 app.include_router(
-    router=transactions.router,
-    prefix="/transactions",
-    tags=["Transactions"]
+    router=transactions.router, prefix="/transactions", tags=["Transactions"]
 )
 
 app.include_router(
-    router=auth.router,
-    prefix="/auth",
-    tags=["Auth"]
+    router=analytics.router,
+    prefix="/analytics",
+    tags="Analytics"
 )
 
-app.include_router(
-    router=profile.router,
-    prefix="/profile",
-    tags=["Profile"]
-)
+app.include_router(router=auth.router, prefix="/auth", tags=["Auth"])
 
-app.include_router(
-    router=categories.router,
-    prefix="/category",
-    tags=["Categories"]
-)
+app.include_router(router=profile.router, prefix="/profile", tags=["Profile"])
+
+app.include_router(router=categories.router,
+                   prefix="/category", tags=["Categories"])
 
 
 @app.get("/")

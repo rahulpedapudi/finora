@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 from decimal import Decimal
-from datetime import datetime
+from datetime import date, datetime
 from uuid import UUID
 from enum import Enum
 from typing import Optional
@@ -15,6 +15,9 @@ class TransactionSearch(BaseModel):
     query: str | None = None
     category: str | None = None
     type: TransactionType | None = None
+    txn_on: date | None = None
+    txn_from: date | None = None
+    txn_to: date | None = None
     min_amount: Decimal | None = None
     max_amount: Decimal | None = None
 
@@ -70,7 +73,7 @@ class TransactionCreate(BaseModel):
         max_length=500
     )
 
-    date: datetime | None = None
+    date_of_transaction: date | None = None
 
 
 class TransactionResponse(BaseModel):
@@ -94,7 +97,7 @@ class TransactionResponse(BaseModel):
 
     note: str | None = None
 
-    date: datetime
+    date_of_transaction: date
 
     created_at: datetime
 
@@ -135,4 +138,4 @@ class TransactionUpdate(BaseModel):
         max_length=500
     )
 
-    date: Optional[datetime] | None = None
+    date_of_transaction: Optional[datetime] | None = None

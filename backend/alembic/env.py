@@ -1,17 +1,16 @@
+from app.models.transaction import Transaction
+from app.models.category import Category
+from app.models.user import User
+from alembic import context
+from sqlalchemy import pool
+from sqlalchemy import engine_from_config
+import os
 from app.db.database import Base
 from logging.config import fileConfig
 
 from dotenv import load_dotenv
-import os
+load_dotenv()
 
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
-
-from alembic import context
-
-from app.models.user import User
-from app.models.category import Category
-from app.models.transaction import Transaction
 
 DB_URL = os.getenv("DATABASE_URL")
 
