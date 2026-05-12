@@ -2,6 +2,8 @@ from datetime import date
 from pydantic import BaseModel
 from decimal import Decimal
 from uuid import UUID
+from pydantic import Field
+from sqlalchemy.ext.hybrid import hybrid_property
 
 
 class AnalyticsSummary(BaseModel):
@@ -26,3 +28,18 @@ class AnalysisCategoryResponse(BaseModel):
     total_amount: Decimal
     transactions: int
     percentage: Decimal
+
+
+class AnalyticsMonthly(BaseModel):
+    month: int | None = None
+    year: int | None = Field(
+        default=date.today().year
+    )
+
+
+class AnalyticsMonthlyResponse(BaseModel):
+    month: int
+    year: int
+    total_expenses: Decimal
+    total_income: Decimal
+    total_savings: Decimal

@@ -1,14 +1,16 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import case, func
+from sqlalchemy import case, func, extract
 
-from app.schemas.analytics import AnalyticsSummary, AnalyticsCategory
+from app.schemas.analytics import AnalyticsSummary, AnalyticsCategory, AnalyticsMonthly
 from app.models.user import User
 from app.models.transaction import Transaction
 from app.models.category import Category
 
 
 def get_summary(parameters: AnalyticsSummary, db: Session, user: User):
-
+    '''
+        this function returns total_expense, total_income, balance, and total_transactions
+    '''
     filters = [Transaction.user_id == user.id]
 
     if parameters.from_:
@@ -17,7 +19,7 @@ def get_summary(parameters: AnalyticsSummary, db: Session, user: User):
 
     if parameters.to_:
         filters.append(
-            Transaction.date_of_transaction >= parameters.to_)
+            Transaction.date_of_transaction <= parameters.to_)
 
     total_expense = db.query(
         func.coalesce(func.sum(Transaction.amount), 0)
@@ -87,12 +89,46 @@ def get_category_breakdown(parameters: AnalyticsCategory, db: Session, user: Use
             Transaction,
             (Transaction.category_id == Category.id) &
             (Transaction.user_id == user.id)
-        )
+        ).filter(*filters)
         .group_by(
             Category.id,
             Category.name
         )
         .all()
     )
+
+    return results
+
+
+def get_monthly_breakdown(parameters: AnalyticsMonthly, db: Session, user: User):
+
+    filters = [Transaction.user_id == user.id]
+
+    expense_func = func.coalesce(func.sum(case((Transaction.type == "expense",
+                                                Transaction.amount), else_=0)), 0)
+
+    income_func = func.coalesce(func.sum(case((Transaction.type == "income",
+                                               Transaction.amount), else_=0)), 0)
+
+    month_expr = extract("month", Transaction.date_of_transaction)
+
+    year_expr = extract("year", Transaction.date_of_transaction)
+
+    if parameters.month:
+        filters.append(
+            extract("month", Transaction.date_of_transaction) == parameters.month)
+
+    if parameters.year:
+        filters.append(
+            extract("year", Transaction.date_of_transaction) == parameters.year
+        )
+
+    results = db.query(
+        (month_expr).label("month"),
+        (year_expr).label("year"),
+        (expense_func).label("total_expenses"),
+        income_func.label("total_income"),
+        (income_func - expense_func).label("total_savings")
+    ).filter(*filters).group_by(month_expr, year_expr).order_by(year_expr, month_expr).all()
 
     return results
