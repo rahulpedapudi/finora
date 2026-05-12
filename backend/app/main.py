@@ -34,13 +34,13 @@ app.include_router(
 app.include_router(
     router=analytics.router,
     prefix="/analytics",
-    tags="Analytics"
+    tags=["Analytics"]
 )
 
 app.include_router(router=auth.router, prefix="/auth", tags=["Auth"])
 
-app.include_router(router=profile.router, prefix="/profile", tags=["Profile"])
-
+app.include_router(router=profile.router,
+                   prefix="/profile", tags=["Profile"])
 app.include_router(router=categories.router,
                    prefix="/category", tags=["Categories"])
 
