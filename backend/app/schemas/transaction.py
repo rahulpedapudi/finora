@@ -25,9 +25,10 @@ class TransactionSearch(BaseModel):
 class ParsedTransaction(BaseModel):
     amount: Decimal
     type: TransactionType
-
     merchant: str | None = None
     title: str | None = None
+    category: str | None = None
+    # payment_method: str | None = None
 
 
 class TransactionCreate(BaseModel):

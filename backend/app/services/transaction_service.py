@@ -5,13 +5,23 @@ from app.models.transaction import Transaction
 from app.models.category import Category
 from app.schemas.transaction import TransactionCreate, TransactionSearch
 from app.services.parsing_service import parse_transaction_input
+from app.services.ai.intelligent_parsing import parse_transaction
 from datetime import datetime, UTC, date
 from fastapi import HTTPException
 
 
 def create_transaction(data: TransactionCreate, db: Session, user: User):
-    parsed = parse_transaction_input(
-        data.raw_input
+    # parsed = parse_transaction_input(
+    #     data.raw_input
+    # )
+    parsed = parse_transaction(data.raw_input)
+
+    category = (
+        db.query(Category)
+        .filter(
+            Category.name.ilike(parsed.category)
+        )
+        .first()
     )
 
     txn = Transaction(
@@ -19,19 +29,19 @@ def create_transaction(data: TransactionCreate, db: Session, user: User):
 
         raw_input=data.raw_input,
 
-        amount=parsed.amount,
+        amount=data.amount or parsed.amount,
 
-        type=parsed.type,
+        type=data.type or parsed.type,
 
-        note=parsed.title,
+        note=data.note,
 
-        merchant=parsed.merchant,
+        merchant=data.merchant or parsed.merchant,
 
-        title=parsed.title,
+        title=data.title or parsed.title,
 
-        category_id=data.category_id,
+        category_id=data.category_id or category.id if category else None,
 
-        payment_method="expense",
+        payment_method=data.payment_method,
 
         date_of_transaction=data.date_of_transaction or date.today()
     )

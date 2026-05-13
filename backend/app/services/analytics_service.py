@@ -71,10 +71,8 @@ def get_category_breakdown(parameters: AnalyticsCategory, db: Session, user: Use
             Category.name,
             Category.id,
             func.count(Transaction.id).label("transactions"),
-            func.coalesce(
-                func.sum(Transaction.amount),
-                0
-            ).label("total_amount"),
+            func.coalesce(func.sum(case((Transaction.type == "expense",
+                                         Transaction.amount), else_=0)), 0).label("total_amount"),
             case(
                 (total_expense == 0, 0),
                 else_=(
