@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from decimal import Decimal
 from uuid import UUID
 from pydantic import Field
-from sqlalchemy.ext.hybrid import hybrid_property
+from enum import Enum
 
 
 class AnalyticsSummary(BaseModel):
@@ -12,14 +12,23 @@ class AnalyticsSummary(BaseModel):
 
 
 class AnalyticsSummaryResponse(BaseModel):
-    total_expense: Decimal | None = None
-    total_income: Decimal | None = None
+    expense: Decimal | None = None
+    income: Decimal | None = None
+    savings: Decimal | None = None
+    savings_rate: Decimal | None = None
+    income_change_percentage: Decimal | None = None
+    expense_change_percentage: Decimal | None = None
+    savings_change_percentage: Decimal | None = None
+
     total_transactions: int | None = None
+    highest_expense: Decimal | None = None
 
 
 class AnalyticsCategory(BaseModel):
     category: str | None = None
-    # maybe add "to and from" date filters too?
+    on_: date | None = None
+    to_: date | None = None
+    from_: date | None = None
 
 
 class AnalysisCategoryResponse(BaseModel):
@@ -43,3 +52,27 @@ class AnalyticsMonthlyResponse(BaseModel):
     total_expenses: Decimal
     total_income: Decimal
     total_savings: Decimal
+
+
+class CashFlowPeriodType(str, Enum):
+    monthly = "monthly"
+    weekly = "weekly"
+    daily = "daily"
+
+
+class CashFlow(BaseModel):
+    period:  CashFlowPeriodType
+    from_: date | None = None
+    to_: date | None = None
+
+
+class CashFlowDataType(BaseModel):
+    label: str
+    income: Decimal
+    expense: Decimal
+    balance: Decimal
+
+
+class CashFlowResponse(BaseModel):
+    period: CashFlowPeriodType
+    data: list[CashFlowDataType]

@@ -4,6 +4,9 @@ import json
 from groq import Groq
 
 from app.schemas.transaction import ParsedTransaction
+import time
+import logging
+logger = logging.getLogger(__name__)
 
 load_dotenv()
 
@@ -72,6 +75,10 @@ Output:
 
 def parse_transaction(raw_input: str):
 
+    start = time.time()
+
+    logger.info("parsing transaction", extra={"raw_input": raw_input})
+
     chat_completion = client.chat.completions.create(
         model="openai/gpt-oss-120b",
         messages=[
@@ -107,8 +114,12 @@ def parse_transaction(raw_input: str):
     )
     try:
         result = json.loads(chat_completion.choices[0].message.content or "{}")
+        duration = time.time() - start
+        logger.info(f"parsed transaction in {duration:.2f}s")
+        logger.debug(f"ai response ", result)
         return ParsedTransaction(**result)
     except Exception:
+        logger.error("Error while parsing the transaction")
         return ParsedTransaction(
             amount=0,
             category="Other",

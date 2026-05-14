@@ -1,19 +1,26 @@
+import time
 from app.models.user import User
 from sqlalchemy.orm import Session
-from sqlalchemy import or_
+from sqlalchemy import or_, and_
 from app.models.transaction import Transaction
 from app.models.category import Category
-from app.schemas.transaction import TransactionCreate, TransactionSearch
+from app.schemas.transaction import TransactionCreate, TransactionSearch, TransactionParams, TransactionReturnType
 from app.services.parsing_service import parse_transaction_input
 from app.services.ai.intelligent_parsing import parse_transaction
 from datetime import datetime, UTC, date
 from fastapi import HTTPException
+
+import logging
+logger = logging.getLogger(__name__)
 
 
 def create_transaction(data: TransactionCreate, db: Session, user: User):
     # parsed = parse_transaction_input(
     #     data.raw_input
     # )
+    start = time.time()
+    logger.info("Creating Transaction", extra={"data": data})
+
     parsed = parse_transaction(data.raw_input)
 
     category = (
@@ -49,12 +56,51 @@ def create_transaction(data: TransactionCreate, db: Session, user: User):
     db.commit()
     db.refresh(txn)
 
+    duration = time.time() - start
+
+    logger.info(f"created transaction in {duration:.2f}s")
     return txn
 
 
-def get_transactions(db: Session, user: User):
-    txns = db.query(Transaction).filter(Transaction.user_id == user.id).all()
-    return txns
+def get_transactions(query_params: TransactionParams, db: Session, user: User):
+    filters = [Transaction.user_id == user.id]
+
+    query = db.query(Transaction).filter(*filters)
+
+    if query_params.cursor_date and query_params.cursor_id:
+        query = query.filter(
+            or_(
+                Transaction.date_of_transaction < query_params.cursor_date,
+                and_(
+                    Transaction.date_of_transaction == query_params.cursor_date,
+                    Transaction.id < query_params.cursor_id
+                )
+            )
+        )
+    transactions = query.order_by(
+        Transaction.date_of_transaction.desc(),
+        Transaction.id.desc()
+    ).limit(query_params.limit + 1).all()
+
+    has_more = len(transactions) > query_params.limit
+
+    transactions = transactions[:query_params.limit]
+
+    next_cursor = None
+
+    if has_more and transactions:
+        last_transaction = transactions[-1]
+
+        next_cursor = {
+            "cursor_date": last_transaction.date_of_transaction.isoformat(),
+            "cursor_id": str(last_transaction.id)
+        }
+
+    return {
+        "transactions": transactions,
+        "next_cursor": next_cursor,
+        "has_more": has_more
+    }
 
 
 def delete_transaction(txn_id, db: Session, user: User):

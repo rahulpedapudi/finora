@@ -7,10 +7,12 @@ from app.models.transaction import Transaction
 from app.models.category import Category
 
 
+# i should return more useful stuff for the dashboard
 def get_summary(parameters: AnalyticsSummary, db: Session, user: User):
     '''
         this function returns total_expense, total_income, balance, and total_transactions
     '''
+
     filters = [Transaction.user_id == user.id]
 
     if parameters.from_:
@@ -41,10 +43,14 @@ def get_summary(parameters: AnalyticsSummary, db: Session, user: User):
         *filters
     ).scalar()
 
+    highest_expense = db.query(
+        func.coalesce(func.max(case((Transaction.type == "expense", Transaction.amount), else_=0))), 0).filter(*filters).scalar()
+
     return {
         "total_expense": total_expense,
         "total_income": total_income,
         "balance": total_income - total_expense,
+        "highest_expense": highest_expense,
         "total_transactions": total_transactions
     }
 
@@ -66,6 +72,15 @@ def get_category_breakdown(parameters: AnalyticsCategory, db: Session, user: Use
     if parameters.category:
         filters.append(Category.name.ilike(f"%{parameters.category}%"))
 
+    if parameters.on_:
+        filters.append(Transaction.date_of_transaction == parameters.on_)
+
+    if parameters.from_:
+        filters.append(Transaction.date_of_transaction >= parameters.from_)
+
+    if parameters.to_:
+        filters.append(Transaction.date_of_transaction <= parameters.to_)
+
     results = (
         db.query(
             Category.name,
@@ -77,7 +92,8 @@ def get_category_breakdown(parameters: AnalyticsCategory, db: Session, user: Use
                 (total_expense == 0, 0),
                 else_=(
                     func.round((
-                        func.coalesce(func.sum(Transaction.amount), 0)
+                        func.coalesce(
+                            func.sum(case((Transaction.type == "expense", Transaction.amount), else_=0)), 0)
                         / total_expense
                     ) * 100, 2
                     ))
@@ -86,7 +102,7 @@ def get_category_breakdown(parameters: AnalyticsCategory, db: Session, user: Use
         .outerjoin(
             Transaction,
             (Transaction.category_id == Category.id) &
-            (Transaction.user_id == user.id)
+            (Transaction.user_id == user.id) & (Transaction.type == "expense")
         ).filter(*filters)
         .group_by(
             Category.id,
@@ -130,3 +146,12 @@ def get_monthly_breakdown(parameters: AnalyticsMonthly, db: Session, user: User)
     ).filter(*filters).group_by(month_expr, year_expr).order_by(year_expr, month_expr).all()
 
     return results
+
+
+def get_breakdown(parameters, db: Session, user: User):
+    pass
+
+# /analytics/spending-trend
+# /analytics/category-breakdown
+# /analytics/cashflow
+# /analytics/budget-progress

@@ -6,12 +6,16 @@ from app.api.routes import profile
 from app.api.routes import categories
 from app.api.routes import analytics
 
+from app.core.logging import setup_logging
+
 from app.db.database import Base, engine
 
 from app.models.user import User
 from app.models.transaction import Transaction
 from app.models.category import Category
 from app.models.budget import Budget
+
+setup_logging()
 
 app = FastAPI()
 

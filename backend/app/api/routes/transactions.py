@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends
-from app.schemas.transaction import TransactionCreate, TransactionResponse, TransactionUpdate, TransactionSearch
+from app.schemas.transaction import TransactionCreate, TransactionResponse, TransactionUpdate, TransactionSearch, TransactionParams
 from app.db.database import get_db
 from app.services import transaction_service
 from app.models.user import User
@@ -21,12 +21,13 @@ def add_transaction(data: TransactionCreate, db: Session = Depends(get_db), curr
     return new_txn
 
 
-@router.get("/", response_model=list[TransactionResponse], status_code=201)
-def get_transactions(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    txns: list[TransactionResponse] = transaction_service.get_transactions(
-        db, current_user)
-
-    return txns
+@router.get("/", response_model=TransactionResponse, status_code=200)
+def get_transactions(
+        transaction_query: TransactionParams = Depends(),
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user)):
+    return transaction_service.get_transactions(
+        transaction_query, db, current_user)
 
 
 @router.delete("/{txn_id}")

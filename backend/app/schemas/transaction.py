@@ -11,6 +11,12 @@ class TransactionType(str, Enum):
     income = "income"
 
 
+class TransactionParams(BaseModel):
+    limit: int = Field(3, le=100)
+    cursor_date: datetime | None = None
+    cursor_id: UUID | None = None
+
+
 class TransactionSearch(BaseModel):
     query: str | None = None
     category: str | None = None
@@ -77,7 +83,7 @@ class TransactionCreate(BaseModel):
     date_of_transaction: date | None = None
 
 
-class TransactionResponse(BaseModel):
+class TransactionReturnType(BaseModel):
     id: UUID
 
     user_id: UUID
@@ -101,6 +107,12 @@ class TransactionResponse(BaseModel):
     date_of_transaction: date
 
     created_at: datetime
+
+
+class TransactionResponse(BaseModel):
+    transactions: list[TransactionReturnType]
+    next_cursor: dict | None = None
+    has_more: bool
 
     class Config:
         from_attributes = True
