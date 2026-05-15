@@ -62,24 +62,35 @@ def create_transaction(data: TransactionCreate, db: Session, user: User):
     return txn
 
 
+def get_transaction_by_id(txn_id, db: Session, user: User):
+    filters = [Transaction.user_id == user.id, Transaction.id == txn_id]
+
+    txn = db.query(Transaction).filter(*filters).first()
+
+    if not txn:
+        raise HTTPException(detail="Transaction not found", status_code=404)
+
+    return txn
+
+
 def get_transactions(query_params: TransactionParams, db: Session, user: User):
     filters = [Transaction.user_id == user.id]
 
     query = db.query(Transaction).filter(*filters)
 
-    if query_params.cursor_date and query_params.cursor_id:
+    if query_params.cursor_date and query_params.cursor_created_at:
         query = query.filter(
             or_(
                 Transaction.date_of_transaction < query_params.cursor_date,
                 and_(
                     Transaction.date_of_transaction == query_params.cursor_date,
-                    Transaction.id < query_params.cursor_id
+                    Transaction.created_at < query_params.cursor_created_at
                 )
             )
         )
     transactions = query.order_by(
         Transaction.date_of_transaction.desc(),
-        Transaction.id.desc()
+        Transaction.created_at.desc()
     ).limit(query_params.limit + 1).all()
 
     has_more = len(transactions) > query_params.limit
@@ -93,7 +104,7 @@ def get_transactions(query_params: TransactionParams, db: Session, user: User):
 
         next_cursor = {
             "cursor_date": last_transaction.date_of_transaction.isoformat(),
-            "cursor_id": str(last_transaction.id)
+            "cursor_created_at": last_transaction.created_at.isoformat()
         }
 
     return {

@@ -13,8 +13,8 @@ class TransactionType(str, Enum):
 
 class TransactionParams(BaseModel):
     limit: int = Field(10, le=100)
-    cursor_date: datetime | None = None
-    cursor_id: UUID | None = None
+    cursor_date: date | None = None
+    cursor_created_at: datetime | None = None
 
 
 class TransactionSearch(BaseModel):
