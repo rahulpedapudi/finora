@@ -27,7 +27,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="overflow-hiddenbg-[radial-gradient(circle_at_top,#fff7f0_0%,#ffffff_50%,#f1f9ff_100%)] relative min-h-screen dark:bg-[radial-gradient(circle_at_top,#0c121f_0%,#070b13_55%,#05080d_100%)]">
+    <div className="overflow-hidden bg-[radial-gradient(circle_at_top,#fff7f0_0%,#ffffff_50%,#f1f9ff_100%)] relative min-h-screen dark:bg-[radial-gradient(circle_at_top,#0c121f_0%,#070b13_55%,#05080d_100%)]">
       <div className="pointer-events-none absolute top-16 -left-10 h-72 w-72 rounded-full bg-[radial-gradient(circle,#ffd7b8_0%,transparent_70%)] opacity-60 blur-3xl" />
       <div className="pointer-events-none absolute right-10 bottom-10 h-64 w-64 rounded-full bg-[conic-gradient(from_200deg,#a6e2ff,#e4f6ff,#bfe4ff)] opacity-50 blur-2xl" />
 

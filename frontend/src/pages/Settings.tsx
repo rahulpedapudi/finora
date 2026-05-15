@@ -22,64 +22,66 @@ export default function Settings() {
     : "U"
 
   return (
-    <div className="max-w-2xl mx-auto space-y-5">
+    <div className="max-w-2xl mx-auto space-y-6">
       {/* Profile */}
-      <div className="bg-card border border-border rounded-xl p-5">
-        <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">
+      <div className="bg-card rounded-[24px] p-6 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] border border-border">
+        <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-6">
           Profile
         </h3>
-        <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-blue-500/20 flex items-center justify-center text-lg font-bold text-blue-400 shrink-0">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-5">
+          <div className="w-16 h-16 rounded-full bg-zinc-900 dark:bg-zinc-100 flex items-center justify-center text-xl font-bold text-white dark:text-zinc-900 shrink-0">
             {initials}
           </div>
           <div>
-            <p className="text-base font-semibold text-foreground">{user?.name ?? "User"}</p>
-            <p className="text-sm text-muted-foreground mt-0.5">{user?.email ?? "—"}</p>
+            <p className="text-lg font-bold text-foreground">{user?.name ?? "User"}</p>
+            <p className="text-sm font-medium text-muted-foreground mt-0.5">{user?.email ?? "—"}</p>
           </div>
         </div>
-        <Separator className="my-4" />
-        <div className="space-y-3">
+        <Separator className="my-6 bg-border" />
+        <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-3">
               <User className="w-4 h-4 text-muted-foreground" />
-              <span className="text-sm text-foreground">Full name</span>
+              <span className="text-sm font-semibold text-foreground">Full name</span>
             </div>
-            <span className="text-sm text-muted-foreground">{user?.name ?? "—"}</span>
+            <span className="text-sm font-medium text-muted-foreground">{user?.name ?? "—"}</span>
           </div>
           <div className="flex justify-between items-center">
-            <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-3">
               <Shield className="w-4 h-4 text-muted-foreground" />
-              <span className="text-sm text-foreground">Email</span>
+              <span className="text-sm font-semibold text-foreground">Email</span>
             </div>
-            <span className="text-sm text-muted-foreground">{user?.email ?? "—"}</span>
+            <span className="text-sm font-medium text-muted-foreground">{user?.email ?? "—"}</span>
           </div>
         </div>
       </div>
 
       {/* Appearance */}
-      <div className="bg-card border border-border rounded-xl p-5">
-        <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">
+      <div className="bg-card rounded-[24px] p-6 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] border border-border">
+        <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-6">
           Appearance
         </h3>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            {theme === "dark" ? (
-              <Moon className="w-4 h-4 text-muted-foreground" />
-            ) : (
-              <Sun className="w-4 h-4 text-muted-foreground" />
-            )}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center shrink-0">
+              {theme === "dark" ? (
+                <Moon className="w-5 h-5 text-muted-foreground" />
+              ) : (
+                <Sun className="w-5 h-5 text-muted-foreground" />
+              )}
+            </div>
             <div>
-              <p className="text-sm text-foreground">Theme</p>
-              <p className="text-xs text-muted-foreground capitalize">{theme} mode</p>
+              <p className="text-sm font-bold text-foreground">Theme</p>
+              <p className="text-xs font-medium text-muted-foreground capitalize">{theme} mode</p>
             </div>
           </div>
-          <div className="flex gap-1 p-1 bg-background border border-border rounded-lg">
+          <div className="flex flex-wrap gap-1 p-1 bg-muted rounded-[20px] sm:rounded-full">
             {(["dark", "light", "system"] as const).map((t) => (
               <button
                 key={t}
                 onClick={() => setTheme(t)}
-                className={`px-3 py-1 rounded-md text-xs font-medium capitalize transition-colors ${
-                  theme === t ? "bg-blue-500 text-white" : "text-muted-foreground hover:text-foreground"
+                className={`px-4 py-1.5 rounded-full text-xs font-bold capitalize transition-colors ${
+                  theme === t ? "bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 shadow-sm" : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 {t}
@@ -90,39 +92,41 @@ export default function Settings() {
       </div>
 
       {/* Notifications */}
-      <div className="bg-card border border-border rounded-xl p-5">
-        <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">
+      <div className="bg-card rounded-[24px] p-6 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] border border-border">
+        <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-6">
           Notifications
         </h3>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <Bell className="w-4 h-4 text-muted-foreground" />
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center shrink-0">
+              <Bell className="w-5 h-5 text-muted-foreground" />
+            </div>
             <div>
-              <p className="text-sm text-foreground">Budget alerts</p>
-              <p className="text-xs text-muted-foreground">Notify when 80% of budget is reached</p>
+              <p className="text-sm font-bold text-foreground">Budget alerts</p>
+              <p className="text-xs font-medium text-muted-foreground">Notify when 80% of budget is reached</p>
             </div>
           </div>
-          <div className="w-9 h-5 bg-blue-500 rounded-full relative cursor-pointer opacity-50">
-            <div className="absolute right-0.5 top-0.5 w-4 h-4 bg-white rounded-full" />
+          <div className="w-10 h-6 bg-[#2BBE4E] rounded-full relative cursor-pointer opacity-50 flex items-center shrink-0">
+            <div className="absolute right-1 w-4 h-4 bg-white rounded-full shadow-sm" />
           </div>
         </div>
       </div>
 
       {/* Danger zone */}
-      <div className="bg-card border border-red-500/20 rounded-xl p-5">
-        <h3 className="text-xs font-semibold text-red-400 uppercase tracking-wider mb-4">
+      <div className="bg-card border border-red-500/20 rounded-[24px] p-6 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)]">
+        <h3 className="text-xs font-bold text-red-500 uppercase tracking-wider mb-6">
           Account
         </h3>
         <button
           onClick={handleLogout}
-          className="flex items-center gap-2 text-sm font-medium text-red-400 hover:text-red-300 transition-colors"
+          className="flex items-center gap-3 text-sm font-bold text-red-500 hover:text-red-400 transition-colors"
         >
-          <LogOut className="w-4 h-4" />
+          <LogOut className="w-5 h-5" />
           Sign out of Finora
         </button>
       </div>
 
-      <p className="text-center text-xs text-muted-foreground/50 pb-4">
+      <p className="text-center text-xs font-medium text-muted-foreground pb-8">
         finora · v0.1.0
       </p>
     </div>

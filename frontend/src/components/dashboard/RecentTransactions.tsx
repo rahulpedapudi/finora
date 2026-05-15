@@ -1,86 +1,80 @@
-import { useTransactionState } from "@/features/transactions/store/transactionState"
-import { TrendingUp, TrendingDown } from "lucide-react"
-import { Link } from "react-router-dom"
-
-function formatDate(dateStr: string) {
-  const d = new Date(dateStr)
-  return d.toLocaleDateString("en-IN", { day: "numeric", month: "short" })
-}
-
-function formatAmount(amount: number) {
-  return `₹${amount.toLocaleString("en-IN", { minimumFractionDigits: 0 })}`
-}
+import { useTransactions } from "@/features/transactions/hooks/useTransactions"
+import { TrendingDown, TrendingUp } from "lucide-react"
+import { formatter } from "@/lib/helpers"
 
 export default function RecentTransactions() {
-  const transactions = useTransactionState((s) => s.data)
-  const recent = [...transactions].reverse().slice(0, 5)
+  const { data, isLoading: transactionsLoading } = useTransactions()
+
+  // Only show the 5 most recent — first page is already sorted desc by date
+  const transactions = (data?.pages[0]?.transactions ?? []).slice(0, 5)
+
+  //   "transactions": [
+  //   {
+  //     "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  //     "user_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  //     "raw_input": "string",
+  //     "amount": "72700883756045970140622674622257271484910370633709463428140992799593636918289681.884763500681781779476570589823519033217985920067700074265",
+  //     "type": "expense",
+  //     "category_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  //     "title": "string",
+  //     "merchant": "string",
+  //     "payment_method": "string",
+  //     "note": "string",
+  //     "date_of_transaction": "2026-05-15",
+  //     "created_at": "2026-05-15T12:24:14.725Z"
+  //   }
+  // ],
+
+  if (transactionsLoading) {
+    return <p>Loading</p>
+  }
 
   return (
-    <div className="bg-card border border-border rounded-xl p-5">
-      <div className="flex items-center justify-between mb-4">
+    <div className="mb-20 flex h-auto flex-col rounded-[24px] bg-background">
+      <div className="mb-4 flex items-center justify-between px-2">
         <h3 className="text-sm font-semibold text-foreground">
           Recent Transactions
         </h3>
-        <Link
-          to="/transactions"
-          className="text-xs text-blue-400 hover:text-blue-300 transition-colors font-medium"
-        >
-          View all
-        </Link>
+        <button className="rounded-full border border-border bg-card px-3 py-1 text-xs font-semibold text-muted-foreground hover:text-foreground">
+          View All
+        </button>
       </div>
 
-      {recent.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-8 text-center">
-          <p className="text-sm text-muted-foreground">No transactions yet</p>
-          <p className="text-xs text-muted-foreground/60 mt-1">
-            Add your first transaction to get started
-          </p>
-        </div>
-      ) : (
-        <div className="space-y-1">
-          {recent.map((txn) => (
+      <div className="flex flex-1 flex-col gap-1 rounded-[24px] border border-border bg-card p-2">
+        {transactions.map((tx) => {
+          return (
             <div
-              key={txn.id}
-              className="flex items-center gap-3 px-2 py-2.5 rounded-lg hover:bg-white/4 transition-colors"
+              key={tx.id}
+              className="flex cursor-pointer items-center justify-between rounded-[16px] p-3 transition-colors hover:bg-muted"
             >
-              {/* Icon */}
+              <div className="flex items-center gap-3">
+                <div
+                  className={`flex h-5 w-5 items-center justify-center rounded-full`}
+                >
+                  {tx.type === "income" ? (
+                    <TrendingUp color="#2BBE4E" />
+                  ) : (
+                    <TrendingDown color="#fb2c36" />
+                  )}
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-foreground">
+                    {tx.title}
+                  </p>
+                  <p className="mt-0.5 text-[10px] text-muted-foreground">
+                    {tx.date_of_transaction}
+                  </p>
+                </div>
+              </div>
               <div
-                className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                  txn.type === "income"
-                    ? "bg-green-500/10"
-                    : "bg-red-500/10"
-                }`}
+                className={`text-sm font-semibold ${tx.type === "income" ? "text-[#2BBE4E]" : "text-red-500"}`}
               >
-                {txn.type === "income" ? (
-                  <TrendingUp className="w-4 h-4 text-green-400" />
-                ) : (
-                  <TrendingDown className="w-4 h-4 text-red-400" />
-                )}
+                {formatter.format(tx.amount)}
               </div>
-
-              {/* Info */}
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-foreground truncate">
-                  {txn.raw_input || txn.merchant || "Transaction"}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {formatDate(txn.date || txn.created_at)}
-                </p>
-              </div>
-
-              {/* Amount */}
-              <span
-                className={`text-sm font-semibold shrink-0 ${
-                  txn.type === "income" ? "text-green-400" : "text-red-400"
-                }`}
-              >
-                {txn.type === "income" ? "+" : "-"}
-                {formatAmount(Number(txn.amount))}
-              </span>
             </div>
-          ))}
-        </div>
-      )}
+          )
+        })}
+      </div>
     </div>
   )
 }
