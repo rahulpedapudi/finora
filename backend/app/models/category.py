@@ -22,7 +22,16 @@ class Category(Base):
     )
 
     name = Column(String)
-    created_at = Column(DateTime, default=datetime.now(UTC))
+
+    color = Column(
+        String,
+        nullable=True,
+    )
+
+    created_at = Column(
+        DateTime,
+        default=lambda: datetime.now(UTC)
+    )
 
     user = relationship("User", back_populates="categories")
     transactions = relationship("Transaction", back_populates="category")

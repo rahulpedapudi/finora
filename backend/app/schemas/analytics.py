@@ -4,6 +4,13 @@ from decimal import Decimal
 from uuid import UUID
 from pydantic import Field
 from enum import Enum
+from pydantic_extra_types.color import Color
+
+
+class PeriodType(str, Enum):
+    monthly = "monthly"
+    weekly = "weekly"
+    daily = "daily"
 
 
 class AnalyticsSummary(BaseModel):
@@ -24,16 +31,24 @@ class AnalyticsSummaryResponse(BaseModel):
     highest_expense: Decimal | None = None
 
 
+class CategoryFilterType(str, Enum):
+    month = "month"
+    today = "today"
+    week = "week"
+
+
 class AnalyticsCategory(BaseModel):
     category: str | None = None
-    on_: date | None = None
-    to_: date | None = None
-    from_: date | None = None
+    period: CategoryFilterType
+    # on_: date | None = None
+    # to_: date | None = None
+    # from_: date | None = None
 
 
-class AnalysisCategoryResponse(BaseModel):
+class CategoryAnalyticsResponse(BaseModel):
     id: UUID
     name: str
+    color: Color
     total_amount: Decimal
     transactions: int
     percentage: Decimal
@@ -54,14 +69,8 @@ class AnalyticsMonthlyResponse(BaseModel):
     total_savings: Decimal
 
 
-class CashFlowPeriodType(str, Enum):
-    monthly = "monthly"
-    weekly = "weekly"
-    daily = "daily"
-
-
 class CashFlow(BaseModel):
-    period:  CashFlowPeriodType
+    period:  PeriodType
     from_: date | None = None
     to_: date | None = None
 
@@ -74,5 +83,5 @@ class CashFlowDataType(BaseModel):
 
 
 class CashFlowResponse(BaseModel):
-    period: CashFlowPeriodType
+    period: PeriodType
     data: list[CashFlowDataType]

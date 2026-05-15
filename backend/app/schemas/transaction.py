@@ -12,7 +12,7 @@ class TransactionType(str, Enum):
 
 
 class TransactionParams(BaseModel):
-    limit: int = Field(3, le=100)
+    limit: int = Field(10, le=100)
     cursor_date: datetime | None = None
     cursor_id: UUID | None = None
 

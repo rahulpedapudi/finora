@@ -12,7 +12,7 @@ from decimal import Decimal
 router = APIRouter()
 
 
-@router.post("/new", response_model=TransactionResponse, status_code=201)
+@router.post("/new", status_code=201)
 def add_transaction(data: TransactionCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     # create_transaction should handle all the parsing and db commits
     new_txn: TransactionResponse = transaction_service.create_transaction(

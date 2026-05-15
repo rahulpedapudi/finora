@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from app.db.database import get_db
 from app.models.user import User
 from app.services import analytics_service
-from app.schemas.analytics import AnalyticsSummary, AnalyticsSummaryResponse, AnalyticsCategory, AnalysisCategoryResponse, AnalyticsMonthly, AnalyticsMonthlyResponse, CashFlow, CashFlowResponse
+from app.schemas.analytics import AnalyticsSummary, AnalyticsSummaryResponse, AnalyticsCategory, AnalyticsMonthly, AnalyticsMonthlyResponse, CashFlow, CashFlowResponse, CategoryAnalyticsResponse
 from app.core.dependencies import get_current_user
 
 from app.services.analytics.summary_service import get_summary
@@ -23,7 +23,7 @@ def get_all_analytics(
     return analytics_data
 
 
-@router.get("/categories", response_model=list[AnalysisCategoryResponse])
+@router.get("/categories", response_model=list[CategoryAnalyticsResponse])
 def get_category_analytics(parameters: AnalyticsCategory = Depends(), db: Session = Depends(get_db), user: User = Depends(get_current_user)):
 
     results = get_category_breakdown(parameters, db, user)
