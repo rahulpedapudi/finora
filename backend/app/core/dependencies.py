@@ -5,20 +5,21 @@ from fastapi import (
 )
 
 from app.db.database import get_db
-from fastapi import Request
 from sqlalchemy.orm import Session
 from app.models.user import User
 from app.core.security import verify_token
 
 
 def get_current_user(request: Request, db: Session = Depends(get_db)):
-    access_token = request.cookies.get("access_token")
+    auth_header = request.headers.get("Authorization")
 
-    if not access_token:
+    if not auth_header or not auth_header.startswith("Bearer "):
         raise HTTPException(
             status_code=401,
             detail='Not authenticated'
         )
+
+    access_token = auth_header.split(" ")[1]
 
     payload = verify_token(access_token)
 
