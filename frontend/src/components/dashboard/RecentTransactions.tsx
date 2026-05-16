@@ -1,12 +1,14 @@
 import { useTransactions } from "@/features/transactions/hooks/useTransactions"
 import { TrendingDown, TrendingUp } from "lucide-react"
 import { formatter } from "@/lib/helpers"
+import { useNavigate } from "react-router-dom"
 
 export default function RecentTransactions() {
   const { data, isLoading: transactionsLoading } = useTransactions()
+  const navigate = useNavigate()
 
   // Only show the 5 most recent — first page is already sorted desc by date
-  const transactions = (data?.pages[0]?.transactions ?? []).slice(0, 5)
+  const transactions = (data?.pages[0]?.transactions ?? []).slice(0, 6)
 
   //   "transactions": [
   //   {
@@ -35,7 +37,12 @@ export default function RecentTransactions() {
         <h3 className="text-sm font-semibold text-foreground">
           Recent Transactions
         </h3>
-        <button className="rounded-full border border-border bg-card px-3 py-1 text-xs font-semibold text-muted-foreground hover:text-foreground">
+        <button
+          onClick={() => {
+            navigate("/transactions")
+          }}
+          className="rounded-full border border-border bg-card px-3 py-1 text-xs font-semibold text-muted-foreground hover:text-foreground"
+        >
           View All
         </button>
       </div>

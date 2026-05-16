@@ -1,7 +1,7 @@
 import { Eye, TrendingUp, TrendingDown } from "lucide-react"
 import React from "react"
 
-interface FinaiSummaryCardProps {
+interface SummaryCardProps {
   title: string
   value: string | React.ReactNode
   change?: string
@@ -19,14 +19,14 @@ export default function SummaryCard({
   variant = "light",
   icon,
   showInsights,
-}: FinaiSummaryCardProps) {
+}: SummaryCardProps) {
   const isDark = variant === "dark"
 
   return (
     <div
-      className={`flex min-h-[130px] sm:h-40 flex-col justify-between rounded-[20px] sm:rounded-[24px] p-4 sm:p-6 ${
+      className={`flex min-h-[130px] flex-col justify-between rounded-[20px] p-4 sm:h-40 sm:rounded-[24px] sm:p-6 ${
         isDark
-          ? "bg-zinc-900 dark:bg-[#2BBE4E] text-white"
+          ? "bg-zinc-900 text-white dark:bg-[#2BBE4E]"
           : "border border-border bg-card text-foreground shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)]"
       }`}
     >
@@ -37,7 +37,7 @@ export default function SummaryCard({
           </div>
         )}
         <span
-          className={`text-xs sm:text-sm font-medium truncate ${isDark ? "text-gray-300 dark:text-green-50" : "text-muted-foreground"}`}
+          className={`truncate text-xs font-medium sm:text-sm ${isDark ? "text-gray-300 dark:text-green-50" : "text-muted-foreground"}`}
         >
           {title}
         </span>
@@ -45,7 +45,7 @@ export default function SummaryCard({
       </div>
 
       <div>
-        <div className="mt-2 mb-3 text-lg sm:text-2xl font-bold tracking-tight lg:text-3xl truncate">
+        <div className="mt-2 mb-3 truncate text-lg font-bold tracking-tight sm:text-2xl lg:text-3xl">
           {value}
         </div>
         {/* i wanna show to something so that the ui doesnt feel awkward */}
@@ -69,7 +69,9 @@ export default function SummaryCard({
               )}
               {change}
             </div>
-            <span className={`hidden sm:inline ${isDark ? "text-gray-400 dark:text-green-100" : "text-muted-foreground"}`}>
+            <span
+              className={`hidden sm:inline ${isDark ? "text-gray-400 dark:text-green-100" : "text-muted-foreground"}`}
+            >
               vs last month
             </span>
           </div>

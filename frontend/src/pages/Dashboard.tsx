@@ -24,6 +24,7 @@ export default function Dashboard() {
   if (summaryLoading) {
     return "Loading"
   }
+  console.log(summaryData)
   return (
     <div className="mx-auto flex h-full max-w-7xl flex-col gap-4">
       {/* Top Row: Summary Cards */}
@@ -39,6 +40,9 @@ export default function Dashboard() {
         <SummaryCard
           title="Monthly Income"
           value={`${formatter.format(parseFloat(summaryData.income))}`}
+          showInsights={
+            summaryData.income_change_percentage == null ? false : true
+          }
           change={`${summaryData.income_change_percentage}%`}
           changeType={
             summaryData.income_change_percentage > 0 ? "positive" : "negative"
@@ -58,7 +62,6 @@ export default function Dashboard() {
               <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
             </svg>
           }
-          showInsights={true}
         />
         <SummaryCard
           title="Monthly Expenses"
@@ -85,7 +88,9 @@ export default function Dashboard() {
               <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
             </svg>
           }
-          showInsights={true}
+          showInsights={
+            summaryData.expense_change_percentage == null ? false : true
+          }
         />
         <SummaryCard
           title="Savings Rate"
@@ -109,7 +114,9 @@ export default function Dashboard() {
               <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
             </svg>
           }
-          showInsights={true}
+          showInsights={
+            summaryData.savings_change_percentage == null ? false : true
+          }
         />
       </div>
 
@@ -139,7 +146,7 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
-      
+
       <DashboardFAB />
     </div>
   )
