@@ -3,18 +3,18 @@ import { NavLink, useNavigate } from "react-router-dom"
 import {
   LayoutDashboard,
   ArrowLeftRight,
-  BarChart2,
-  Target,
+  // BarChart2,
+  // Target,
   Settings,
   LogOut,
-  CreditCard,
-  Lightbulb,
-  HelpCircle,
+  // CreditCard,
+  // Lightbulb,
+  // HelpCircle,
   Sparkles,
   Send,
   PanelLeftClose,
   PanelLeftOpen,
-  DollarSign,
+  // DollarSign,
 } from "lucide-react"
 import { useAuthStore } from "@/features/auth/store/authStore"
 import { logout } from "@/features/auth/api/logout"
@@ -199,7 +199,11 @@ export default function Sidebar() {
                 placeholder="Ask me anything finance..."
                 className="w-full rounded-full border border-border bg-background py-2.5 pr-8 pl-3 text-xs text-foreground transition-colors outline-none focus:border-[#2BBE4E]"
               />
-              <button className="absolute top-1/2 right-2 -translate-y-1/2 text-muted-foreground hover:text-[#2BBE4E]">
+              <button
+                title="send"
+                type="button"
+                className="absolute top-1/2 right-2 -translate-y-1/2 text-muted-foreground hover:text-[#2BBE4E]"
+              >
                 <Send className="h-3.5 w-3.5" />
               </button>
             </div>

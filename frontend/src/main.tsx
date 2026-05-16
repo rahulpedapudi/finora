@@ -5,6 +5,8 @@ import "./index.css"
 import App from "./App.tsx"
 import { ThemeProvider } from "@/components/theme-provider.tsx"
 import { QueryProvider } from "./app/providers/QueryProvider.tsx"
+import { registerSW } from "virtual:pwa-register"
+registerSW({ immediate: true })
 
 createRoot(document.getElementById("root")!).render(
   <QueryProvider>

@@ -21,7 +21,7 @@ interface TransactionType {
 }
 
 interface TransactionDetailModalProps {
-  data: TransactionType
+  data: TransactionType | undefined
   open: boolean
   onClose: () => void
 }
@@ -35,34 +35,39 @@ export default function TransactionDetailModal({
     onClose()
   }
 
-  const isIncome = data.type === "income"
+  const amount = data?.amount
+  const isIncome = data?.type === "income"
   const amountPrefix = isIncome ? "+" : "-"
   const amountColor = isIncome ? "text-[#2BBE4E]" : "text-foreground"
   const amountBgColor = isIncome
     ? "bg-[#EEF8F1] dark:bg-[#EEF8F1]/10 text-[#2BBE4E]"
     : "bg-muted text-muted-foreground"
-
-  const formattedAmount = new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency: "INR",
-  }).format(Math.abs(data.amount))
-
-  const formattedDate = new Date(data.date_of_transaction).toLocaleDateString(
-    "en-US",
-    {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    }
-  )
+  var formattedDate = ""
+  var formattedAmount
+  if (amount) {
+    formattedAmount = new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+    }).format(amount)
+  }
+  if (data?.date_of_transaction) {
+    formattedDate = new Date(data.date_of_transaction).toLocaleDateString(
+      "en-US",
+      {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      }
+    )
+  }
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="overflow-hidden border-border bg-card p-0 text-foreground shadow-2xl sm:max-w-[425px]">
+      <DialogContent className="overflow-hidden border-border bg-card p-0 text-foreground shadow-2xl sm:max-w-106.25">
         <div className="p-6 pb-4">
           <DialogHeader>
             <DialogTitle className="text-xl font-semibold tracking-tight text-foreground">
-              {data.title}
+              {data?.title}
             </DialogTitle>
             <DialogDescription className="text-muted-foreground">
               Transaction Details
@@ -104,7 +109,7 @@ export default function TransactionDetailModal({
                 <span>Merchant</span>
               </div>
               <span className="font-medium text-foreground">
-                {data.merchant || "N/A"}
+                {data?.merchant || "N/A"}
               </span>
             </div>
 
@@ -116,7 +121,7 @@ export default function TransactionDetailModal({
                 <span>Payment Method</span>
               </div>
               <span className="font-medium text-foreground capitalize">
-                {data.payment_method || "N/A"}
+                {data?.payment_method || "N/A"}
               </span>
             </div>
 
@@ -128,12 +133,12 @@ export default function TransactionDetailModal({
                 <span>Category</span>
               </div>
               <span className="font-medium text-foreground">
-                {data.category_id || "Uncategorized"}
+                {data?.category_id || "Uncategorized"}
               </span>
             </div>
           </div>
 
-          {data.note && (
+          {data?.note && (
             <div className="mt-4 space-y-3 rounded-2xl border border-border bg-muted/50 p-5 text-sm shadow-inner">
               <div className="flex items-center space-x-3 text-muted-foreground">
                 <AlignLeft className="h-4 w-4" />

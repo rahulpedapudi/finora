@@ -1,4 +1,9 @@
-import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom"
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Navigate,
+} from "react-router-dom"
 import LoginPage from "./features/auth/pages/LoginPage.tsx"
 import RegisterPage from "./features/auth/pages/RegisterPage"
 import ProtectedRoute from "./features/auth/components/ProtectedRoute"
@@ -7,7 +12,7 @@ import AppLayout from "./components/layout/AppLayout"
 import Dashboard from "./pages/Dashboard"
 import HomePage from "./pages/HomePage.tsx"
 import Transactions from "./pages/Transactions"
-import Analytics from "./pages/Analytics"
+// import Analytics from "./pages/Analytics"
 import Budgets from "./pages/Budgets"
 import Settings from "./pages/Settings"
 
@@ -24,7 +29,7 @@ export default function App() {
             <Route element={<AppLayout />}>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/transactions" element={<Transactions />} />
-              <Route path="/analytics" element={<Analytics />} />
+              {/* <Route path="/analytics" element={<Analytics />} /> */}
               <Route path="/budgets" element={<Budgets />} />
               <Route path="/settings" element={<Settings />} />
             </Route>

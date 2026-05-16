@@ -3,6 +3,14 @@ import { TrendingDown, TrendingUp } from "lucide-react"
 import { formatter } from "@/lib/helpers"
 import { useNavigate } from "react-router-dom"
 
+interface TransactionType {
+  id: string
+  amount: number
+  title: string
+  date_of_transaction: string
+  type: string
+}
+
 export default function RecentTransactions() {
   const { data, isLoading: transactionsLoading } = useTransactions()
   const navigate = useNavigate()
@@ -48,7 +56,7 @@ export default function RecentTransactions() {
       </div>
 
       <div className="flex flex-1 flex-col gap-1 rounded-[24px] border border-border bg-card p-2">
-        {transactions.map((tx) => {
+        {transactions.map((tx: TransactionType) => {
           return (
             <div
               key={tx.id}

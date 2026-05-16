@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { Search, Plus, TrendingDown, TrendingUp, Wallet } from "lucide-react"
 import { useTransactions } from "@/features/transactions/hooks/useTransactions"
 import TransactionItem from "@/components/transactions/TransactionItem"
@@ -9,13 +9,28 @@ import { Button } from "@/components/ui/button"
 
 type FilterType = "all" | "income" | "expense"
 
+interface TransactionType {
+  id: string
+  title: string
+  category_id: string
+  amount: number
+  merchant: string
+  payment_method: string
+  note: string
+  type: "income" | "expense"
+  date_of_transaction: string
+  created_at: string
+}
+
 export default function Transactions() {
   const [modalOpen, setModalOpen] = useState(false)
   const [search, setSearch] = useState("")
   const [filter, setFilter] = useState<FilterType>("all")
 
   const [transactionModalOpen, setTransactionModalOpen] = useState(false)
-  const [transactionDetail, setTransactionDetail] = useState({})
+  const [transactionDetail, setTransactionDetail] = useState<
+    TransactionType | undefined
+  >()
 
   const {
     data,
@@ -198,7 +213,7 @@ export default function Transactions() {
             <p className="text-base font-bold text-foreground">
               No transactions found
             </p>
-            <p className="mt-2 max-w-[250px] text-sm text-muted-foreground">
+            <p className="mt-2 max-w-62.5 text-sm text-muted-foreground">
               {search || filter !== "all"
                 ? "We couldn't find any transactions matching your filters."
                 : "You don't have any transactions yet. Click the + button to add one."}

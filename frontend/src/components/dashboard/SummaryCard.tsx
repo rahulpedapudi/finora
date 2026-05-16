@@ -1,4 +1,4 @@
-import { Eye, TrendingUp, TrendingDown } from "lucide-react"
+import { TrendingUp, TrendingDown } from "lucide-react"
 import React from "react"
 
 interface SummaryCardProps {

@@ -1,6 +1,5 @@
 import { useCategoryAnalytics } from "@/features/analytics/hooks/useCategoryAnalytics"
-import { ChevronDown } from "lucide-react"
-import { Pie, PieChart, Tooltip } from "recharts"
+import { Pie, PieChart } from "recharts"
 import { useState } from "react"
 import { formatter } from "@/lib/helpers"
 import {
@@ -32,27 +31,26 @@ interface CategoryType {
   percentage: number
 }
 
-type PieTooltipProps = {
-  active?: boolean
-  payload?: Array<{ name?: string; value?: number }>
-}
+// const CustomPieTooltip = ({
+//   active,
+//   payload,
+// }: TooltipContentProps<number, string>) => {
+//   if (!active || !payload || payload.length === 0) {
+//     return null
+//   }
 
-const renderPieTooltip = ({ active, payload }: PieTooltipProps) => {
-  if (!active || !payload || payload.length === 0) {
-    return null
-  }
+//   const item = payload[0]
+//   const label = item?.name ?? "Unknown"
+//   const value =
+//     typeof item?.value === "number" ? item.value : Number(item?.value ?? 0)
 
-  const item = payload[0]
-  const label = item?.name ?? "Unknown"
-  const value = item?.value ?? 0
-
-  return (
-    <div className="rounded-lg border border-border bg-card px-3 py-2 text-xs shadow-sm">
-      <div className="font-medium text-foreground">{label}</div>
-      <div className="text-muted-foreground">{formatter.format(value)}</div>
-    </div>
-  )
-}
+//   return (
+//     <div className="rounded-lg border border-border bg-card px-3 py-2 text-xs shadow-sm">
+//       <div className="font-medium text-foreground">{label}</div>
+//       <div className="text-muted-foreground">{formatter.format(value)}</div>
+//     </div>
+//   )
+// }
 
 export default function SpendingOverview() {
   const [spendingOverviewFilter, setSpendingOverviewFilter] = useState<
@@ -126,7 +124,6 @@ export default function SpendingOverview() {
             dataKey="value"
             isAnimationActive={true}
           />
-          <Tooltip content={renderPieTooltip} />
         </PieChart>
 
         {/* Breakdown List Side */}
