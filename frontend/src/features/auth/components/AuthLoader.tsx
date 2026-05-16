@@ -25,7 +25,15 @@ export default function AuthLoader({
     loadUser()
   }, [])
 
-  if (loading) return <h1>Loading....</h1>
+  if (loading)
+    return (
+      <div className="flex h-screen w-screen items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-3">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-border border-t-[#2BBE4E]" />
+          <span className="text-sm text-muted-foreground">Loading...</span>
+        </div>
+      </div>
+    )
 
   return children
 }

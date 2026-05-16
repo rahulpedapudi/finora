@@ -22,9 +22,21 @@ export default function Dashboard() {
   const { data: summaryData, isLoading: summaryLoading } = useSummary()
 
   if (summaryLoading) {
-    return "Loading"
+    return (
+      <div className="flex h-full items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-border border-t-[#2BBE4E]" />
+      </div>
+    )
   }
-  console.log(summaryData)
+
+  if (!summaryData) {
+    return (
+      <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
+        Could not load summary data.
+      </div>
+    )
+  }
+
   return (
     <div className="mx-auto flex h-full max-w-7xl flex-col gap-4">
       {/* Top Row: Summary Cards */}
