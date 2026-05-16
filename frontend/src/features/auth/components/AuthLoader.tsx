@@ -13,6 +13,13 @@ export default function AuthLoader({
 
   useEffect(() => {
     const loadUser = async () => {
+      // Skip the network call entirely if no token in storage
+      const token = localStorage.getItem("access_token")
+      if (!token) {
+        setLoading(false)
+        return
+      }
+
       try {
         const user = await getCurrentUser()
         setUser(user)

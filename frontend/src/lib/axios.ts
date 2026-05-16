@@ -1,17 +1,22 @@
 import axios from "axios"
 
-// Read base URL from environment (.env). Support Vite and Create React App env names,
-// fallback to the previous local default if not provided.
 const BASE_URL = import.meta.env.VITE_API_BASE_URL
 
 export const api = axios.create({
   baseURL: BASE_URL,
-  withCredentials: true,
 })
 
 const refreshApi = axios.create({
   baseURL: BASE_URL,
-  withCredentials: true,
+})
+
+// Attach the access token to every request from localStorage
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("access_token")
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
+  }
+  return config
 })
 
 api.interceptors.response.use(
@@ -20,22 +25,32 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config
 
-    // token expired
+    // Access token expired — try to refresh
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true
 
       try {
-        // get new access token
-        await refreshApi.post("/auth/refresh")
+        const refreshToken = localStorage.getItem("refresh_token")
 
-        // retry failed request
+        if (!refreshToken) throw new Error("No refresh token")
+
+        // Exchange refresh token for new tokens
+        const res = await refreshApi.post("/auth/refresh", {
+          refresh_token: refreshToken,
+        })
+
+        const { access_token, refresh_token } = res.data
+        localStorage.setItem("access_token", access_token)
+        localStorage.setItem("refresh_token", refresh_token)
+
+        // Retry original request with new access token
+        originalRequest.headers.Authorization = `Bearer ${access_token}`
         return api(originalRequest)
       } catch (refreshError) {
-        // refresh failed
-        // Remove hard redirect to prevent infinite loops on public pages
-        // window.location.href = "/login"
+        // Refresh failed — clear storage and log out
+        localStorage.removeItem("access_token")
+        localStorage.removeItem("refresh_token")
 
-        // Let Zustand and ProtectedRoute handle the redirect gracefully
         import("../features/auth/store/authStore").then(({ useAuthStore }) => {
           useAuthStore.getState().logout()
         })
