@@ -1,6 +1,8 @@
 import axios from "axios"
 
-const BASE_URL = "http://192.168.31.6:8000/"
+// Read base URL from environment (.env). Support Vite and Create React App env names,
+// fallback to the previous local default if not provided.
+const BASE_URL = import.meta.env.VITE_API_BASE_URL
 
 export const api = axios.create({
   baseURL: BASE_URL,
