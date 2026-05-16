@@ -31,8 +31,8 @@ def login(user_data: LoginRequest, response: Response, db: Session = Depends(get
         key="access_token",
         value=tokens["access_token"],
         httponly=True,
-        secure=False,
-        samesite="lax",
+        secure=True,       # Required for cross-site (Vercel -> Render)
+        samesite="none",   # Required for cross-origin cookie sending
         max_age=60 * Config.ACCESS_EXP
     )
 
@@ -40,8 +40,8 @@ def login(user_data: LoginRequest, response: Response, db: Session = Depends(get
         key="refresh_token",
         value=tokens["refresh_token"],
         httponly=True,
-        secure=False,
-        samesite="lax",
+        secure=True,       # Required for cross-site (Vercel -> Render)
+        samesite="none",   # Required for cross-origin cookie sending
         max_age=60 * 60 * 24 * Config.REFRESH_EXP
     )
 
@@ -69,8 +69,8 @@ def refresh_tokens(response: Response, request: Request):
         key="access_token",
         value=tokens["access_token"],
         httponly=True,
-        secure=False,
-        samesite="lax",
+        secure=True,       # Required for cross-site (Vercel -> Render)
+        samesite="none",   # Required for cross-origin cookie sending
         max_age=60 * Config.ACCESS_EXP
     )
 
