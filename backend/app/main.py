@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+import os
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.routes import transactions
 from app.api.routes import auth
@@ -15,14 +16,20 @@ from app.models.transaction import Transaction
 from app.models.category import Category
 from app.models.budget import Budget
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 setup_logging()
 
 app = FastAPI()
 
+FRONTEND_URL = os.getenv("FRONTEND_URL")
+
 app.add_middleware(
     CORSMiddleware,
     # Allows specific origins (use ["*"] for all)
-    allow_origins=["*"],
+    allow_origins=[FRONTEND_URL],
     allow_credentials=True,  # Allows cookies and authentication headers
     # Allows all HTTP methods (GET, POST, etc.)
     allow_methods=["*"],
