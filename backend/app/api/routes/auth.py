@@ -79,7 +79,19 @@ def refresh_tokens(response: Response, request: Request):
 
 @router.post("/logout")
 def logout(response: Response):
-    response.delete_cookie("access_token")
-    response.delete_cookie("refresh_token")
+    # Attributes must match the original set_cookie exactly,
+    # otherwise the browser won't clear the cookie.
+    response.delete_cookie(
+        key="access_token",
+        httponly=True,
+        secure=True,
+        samesite="none",
+    )
+    response.delete_cookie(
+        key="refresh_token",
+        httponly=True,
+        secure=True,
+        samesite="none",
+    )
 
     return {"message": "logged out"}
