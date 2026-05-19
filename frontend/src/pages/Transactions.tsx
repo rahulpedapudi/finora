@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Search, Plus, TrendingDown, TrendingUp, Wallet } from "lucide-react"
+import { Search, TrendingDown, TrendingUp, Wallet } from "lucide-react"
 import { useTransactions } from "@/features/transactions/hooks/useTransactions"
 import TransactionItem from "@/components/transactions/TransactionItem"
 import AddTransactionModal from "@/components/transactions/AddTransactionModal"
@@ -40,55 +40,58 @@ export default function Transactions() {
   } = useTransactions()
 
   const allTransactions = data?.pages.flatMap((page) => page.transactions) ?? []
+  {
+    console.log(allTransactions)
+  }
 
   // Filter transactions based on search and type
-  const filteredTransactions = allTransactions.filter((t) => {
-    const matchesSearch = (t.title || t.merchant || "")
-      .toLowerCase()
-      .includes(search.toLowerCase())
-    const matchesType = filter === "all" ? true : t.type === filter
-    return matchesSearch && matchesType
-  })
+  // const filteredTransactions = allTransactions.filter((t) => {
+  //   const matchesSearch = (t.title || t.merchant || "")
+  //     .toLowerCase()
+  //     .includes(search.toLowerCase())
+  //   const matchesType = filter === "all" ? true : t.type === filter
+  //   return matchesSearch && matchesType
+  // })
 
-  // Sort descending
-  const sortedTxns = [...filteredTransactions].sort((a, b) => {
-    const dA = new Date(a.date_of_transaction || a.created_at || 0).getTime()
-    const dB = new Date(b.date_of_transaction || b.created_at || 0).getTime()
-    return dB - dA
-  })
+  // // Sort descending
+  // const sortedTxns = [...filteredTransactions].sort((a, b) => {
+  //   const dA = new Date(a.date_of_transaction || a.created_at || 0).getTime()
+  //   const dB = new Date(b.date_of_transaction || b.created_at || 0).getTime()
+  //   return dB - dA
+  // })
 
   // Group by date
-  const groupedArray: { title: string; items: typeof allTransactions }[] = []
-  let currentGroup: { title: string; items: typeof allTransactions } | null =
-    null
+  // const groupedArray: { title: string; items: typeof allTransactions }[] = []
+  // let currentGroup: { title: string; items: typeof allTransactions } | null =
+  //   null
 
-  for (const txn of sortedTxns) {
-    const d = new Date(txn.date_of_transaction || txn.created_at || new Date())
-    const today = new Date()
-    const yesterday = new Date(today)
-    yesterday.setDate(yesterday.getDate() - 1)
+  // for (const txn of sortedTxns) {
+  //   const d = new Date(txn.date_of_transaction || txn.created_at || new Date())
+  //   const today = new Date()
+  //   const yesterday = new Date(today)
+  //   yesterday.setDate(yesterday.getDate() - 1)
 
-    const isToday = d.toDateString() === today.toDateString()
-    const isYesterday = d.toDateString() === yesterday.toDateString()
+  //   const isToday = d.toDateString() === today.toDateString()
+  //   const isYesterday = d.toDateString() === yesterday.toDateString()
 
-    let groupKey = ""
-    if (isToday) groupKey = "Today"
-    else if (isYesterday) groupKey = "Yesterday"
-    else {
-      groupKey = d.toLocaleDateString("en-IN", {
-        month: "short",
-        day: "numeric",
-        year: d.getFullYear() === today.getFullYear() ? undefined : "numeric",
-      })
-    }
+  //   let groupKey = ""
+  //   if (isToday) groupKey = "Today"
+  //   else if (isYesterday) groupKey = "Yesterday"
+  //   else {
+  //     groupKey = d.toLocaleDateString("en-IN", {
+  //       month: "short",
+  //       day: "numeric",
+  //       year: d.getFullYear() === today.getFullYear() ? undefined : "numeric",
+  //     })
+  //   }
 
-    if (!currentGroup || currentGroup.title !== groupKey) {
-      if (currentGroup) groupedArray.push(currentGroup)
-      currentGroup = { title: groupKey, items: [] }
-    }
-    currentGroup.items.push(txn)
-  }
-  if (currentGroup) groupedArray.push(currentGroup)
+  //   if (!currentGroup || currentGroup.title !== groupKey) {
+  //     if (currentGroup) groupedArray.push(currentGroup)
+  //     currentGroup = { title: groupKey, items: [] }
+  //   }
+  //   currentGroup.items.push(txn)
+  // }
+  // if (currentGroup) groupedArray.push(currentGroup)
 
   // Calculate totals from ALL transactions
   const totalIncome = allTransactions
@@ -164,7 +167,7 @@ export default function Transactions() {
       </div>
 
       {/* Toolbar & Filters */}
-      <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
+      {/* <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
         <div className="flex w-full rounded-full border border-border bg-card p-1 shadow-sm sm:w-auto">
           {(["all", "income", "expense"] as FilterType[]).map((f) => (
             <button
@@ -201,11 +204,11 @@ export default function Transactions() {
             <Plus className="h-5 w-5" strokeWidth={2.5} />
           </button>
         </div>
-      </div>
+      </div> */}
 
       {/* Transactions list */}
       <div className="rounded-[32px] border border-border bg-card p-4 shadow-sm">
-        {groupedArray.length === 0 ? (
+        {allTransactions.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-32 text-center">
             <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
               <Search className="h-8 w-8 text-muted-foreground" />
@@ -232,13 +235,13 @@ export default function Transactions() {
           </div>
         ) : (
           <div className="flex flex-col gap-6">
-            {groupedArray.map((group) => (
-              <div key={group.title}>
-                <h3 className="sticky top-0 z-10 bg-card/90 px-4 py-2 text-xs font-bold tracking-wider text-muted-foreground uppercase backdrop-blur-md">
-                  {group.title}
-                </h3>
-                <div className="mt-2 flex flex-col gap-1">
-                  {group.items.map((txn) => (
+            {allTransactions &&
+              allTransactions.map((txn) => (
+                <div key={txn.title}>
+                  <h3 className="sticky top-0 z-10 bg-card/90 px-4 py-2 text-xs font-bold tracking-wider text-muted-foreground uppercase backdrop-blur-md">
+                    {txn.title}
+                  </h3>
+                  <div className="mt-2 flex flex-col gap-1">
                     <TransactionItem
                       key={txn.id}
                       {...txn}
@@ -248,10 +251,9 @@ export default function Transactions() {
                         setTransactionDetail(txn)
                       }}
                     />
-                  ))}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
         )}
       </div>

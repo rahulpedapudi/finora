@@ -2,7 +2,7 @@ import { NavLink } from "react-router-dom"
 import {
   LayoutDashboard,
   ArrowLeftRight,
-  // BarChart2,
+  BarChart2,
   // Target,
   Settings,
 } from "lucide-react"
@@ -10,7 +10,7 @@ import {
 const navItems = [
   { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
   { to: "/transactions", icon: ArrowLeftRight, label: "Transactions" },
-  // { to: "/analytics", icon: BarChart2, label: "Analytics" },
+  { to: "/analytics", icon: BarChart2, label: "Analytics" },
   // { to: "/budgets", icon: Target, label: "Budgets" },
   { to: "/settings", icon: Settings, label: "Settings" },
 ]

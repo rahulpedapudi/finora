@@ -1,164 +1,398 @@
-// import { useEffect } from "react"
-// import { useTransactionState } from "@/features/transactions/store/transactionState"
+import SummaryCard from "@/components/dashboard/SummaryCard"
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { useCashFlow } from "@/features/analytics/hooks/useCashFlow"
+import { useCategoryAnalytics } from "@/features/analytics/hooks/useCategoryAnalytics"
+import { useSummary } from "@/features/analytics/hooks/useSummary"
+import { formatter } from "@/lib/helpers"
+import { useState } from "react"
+import {
+  Area,
+  AreaChart,
+  Bar,
+  BarChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts"
 
-// const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+export default function Analytics() {
+  const [cashFlowParam, setCashFlowParam] = useState<
+    "monthly" | "daily" | "weekly"
+  >("monthly")
 
-// const MOCK_CATEGORY_DATA = [
-//   { name: "Food & Dining", amount: 4200, color: "bg-zinc-900 dark:bg-zinc-100", pct: 35 },
-//   { name: "Transport", amount: 1800, color: "bg-[#9CF0B6] dark:bg-[#9CF0B6]/80", pct: 15 },
-//   { name: "Shopping", amount: 3100, color: "bg-[#2BBE4E]", pct: 26 },
-//   { name: "Utilities", amount: 1900, color: "bg-[#71CF8A] dark:bg-[#71CF8A]/80", pct: 16 },
-//   { name: "Entertainment", amount: 900, color: "bg-[#C4F3D3] dark:bg-[#C4F3D3]/80", pct: 8 },
-// ]
+  const [cashFlowType, setCashFlowType] = useState<
+    "net" | "expense" | "income"
+  >("net")
 
-// export default function Analytics() {
-//   const { data: transactions, fetchTransactions } = useTransactionState()
+  const { data: summaryData, isLoading: summaryLoading } = useSummary()
 
-//   useEffect(() => {
-//     fetchTransactions()
-//   }, [])
+  const { data: cashFlowData, isLoading: cashFlowLoading } = useCashFlow({
+    period: cashFlowParam,
+  })
 
-//   // Compute last 6 months spending from real data
-//   const now = new Date()
-//   const monthlyData = Array.from({ length: 6 }, (_, i) => {
-//     const d = new Date(now.getFullYear(), now.getMonth() - (5 - i), 1)
-//     const month = d.getMonth()
-//     const year = d.getFullYear()
-//     const spend = transactions
-//       .filter((t) => {
-//         const td = new Date(t.date || t.created_at)
-//         return (
-//           t.type === "expense" &&
-//           td.getMonth() === month &&
-//           td.getFullYear() === year
-//         )
-//       })
-//       .reduce((s, t) => s + Number(t.amount), 0)
-//     const income = transactions
-//       .filter((t) => {
-//         const td = new Date(t.date || t.created_at)
-//         return (
-//           t.type === "income" &&
-//           td.getMonth() === month &&
-//           td.getFullYear() === year
-//         )
-//       })
-//       .reduce((s, t) => s + Number(t.amount), 0)
-//     return { label: MONTHS[month], spend, income }
-//   })
+  const [categoryFilter, setCategoryFilter] = useState<
+    "week" | "today" | "month"
+  >("month")
 
-//   const maxVal = Math.max(...monthlyData.flatMap((m) => [m.spend, m.income]), 1)
+  const { data: categoryData } = useCategoryAnalytics({
+    period: categoryFilter,
+  })
 
-//   const totalSpend = monthlyData.reduce((s, m) => s + m.spend, 0)
-//   const totalIncome = monthlyData.reduce((s, m) => s + m.income, 0)
-//   const avgMonthly = totalSpend / 6
+  if (summaryLoading) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-border border-t-[#2BBE4E]" />
+      </div>
+    )
+  }
 
-//   return (
-//     <div className="max-w-4xl mx-auto space-y-6">
-//       {/* Top stats */}
-//       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-//         <div className="bg-card rounded-[24px] p-6 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] border border-border flex flex-col justify-center">
-//           <p className="text-xs font-semibold text-muted-foreground">6-mo Income</p>
-//           <p className="text-2xl font-bold text-[#2BBE4E] mt-1">
-//             ${totalIncome.toLocaleString("en-US", { minimumFractionDigits: 2 })}
-//           </p>
-//         </div>
-//         <div className="bg-card rounded-[24px] p-6 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] border border-border flex flex-col justify-center">
-//           <p className="text-xs font-semibold text-muted-foreground">6-mo Expenses</p>
-//           <p className="text-2xl font-bold text-red-500 mt-1">
-//             ${totalSpend.toLocaleString("en-US", { minimumFractionDigits: 2 })}
-//           </p>
-//         </div>
-//         <div className="bg-card rounded-[24px] p-6 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] border border-border flex flex-col justify-center">
-//           <p className="text-xs font-semibold text-muted-foreground">Avg Monthly</p>
-//           <p className="text-2xl font-bold text-foreground mt-1">
-//             ${Math.round(avgMonthly).toLocaleString("en-US", { minimumFractionDigits: 2 })}
-//           </p>
-//         </div>
-//       </div>
+  if (!summaryData) {
+    return (
+      <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
+        Could not load summary data.
+      </div>
+    )
+  }
+  let cashflow
+  if (!cashFlowLoading) {
+    cashflow = cashFlowData.data.map((group: any) => {
+      return {
+        label: group.label,
+        net: group.balance,
+        expense: group.expense,
+        income: group.income,
+      }
+    })
+  }
 
-//       {/* Monthly bar chart */}
-//       <div className="bg-card rounded-[24px] p-6 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] border border-border">
-//         <div className="flex items-center justify-between mb-8">
-//           <h3 className="text-sm font-semibold text-foreground">
-//             Monthly Overview
-//           </h3>
-//           <div className="flex items-center gap-4 text-xs font-medium text-muted-foreground">
-//             <span className="flex items-center gap-1.5">
-//               <span className="w-2.5 h-2.5 rounded-full bg-zinc-900 dark:bg-zinc-100" />
-//               Expenses
-//             </span>
-//             <span className="flex items-center gap-1.5">
-//               <span className="w-2.5 h-2.5 rounded-full bg-[#2BBE4E]" />
-//               Income
-//             </span>
-//           </div>
-//         </div>
-//         <div className="flex items-end gap-2 sm:gap-4 h-48">
-//           {monthlyData.map(({ label, spend, income }) => (
-//             <div key={label} className="flex-1 flex flex-col items-center gap-3">
-//               <div className="w-full max-w-[40px] flex items-end justify-center gap-1 sm:gap-2 h-36">
-//                 {/* Expense bar */}
-//                 <div className="flex-1 flex flex-col justify-end h-full">
-//                   <div
-//                     className="w-full bg-zinc-900 dark:bg-zinc-100 rounded-t-md hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors"
-//                     style={{ height: `${(spend / maxVal) * 100}%` }}
-//                     title={`$${spend.toLocaleString("en-US")}`}
-//                   />
-//                 </div>
-//                 {/* Income bar */}
-//                 <div className="flex-1 flex flex-col justify-end h-full">
-//                   <div
-//                     className="w-full bg-[#2BBE4E] rounded-t-md hover:bg-[#25A243] transition-colors"
-//                     style={{ height: `${(income / maxVal) * 100}%` }}
-//                     title={`$${income.toLocaleString("en-US")}`}
-//                   />
-//                 </div>
-//               </div>
-//               <span className="text-xs font-medium text-muted-foreground">{label}</span>
-//             </div>
-//           ))}
-//         </div>
-//       </div>
+  return (
+    <>
+      <div className="relative mx-auto max-w-6xl space-y-8">
+        <div className="absolute inset-x-0 -top-12 -z-10 h-48 rounded-[40px] bg-[radial-gradient(circle_at_top,rgba(99,102,241,0.18),transparent_70%)]" />
 
-//       {/* Category breakdown */}
-//       <div className="bg-card rounded-[24px] p-6 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] border border-border">
-//         <div className="flex items-center justify-between mb-6">
-//           <h3 className="text-sm font-semibold text-foreground">
-//             Spending by Category
-//           </h3>
-//           <span className="text-xs font-medium text-muted-foreground">This month · est.</span>
-//         </div>
-//         <div className="space-y-5">
-//           {MOCK_CATEGORY_DATA.map(({ name, amount, color, pct }) => (
-//             <div key={name}>
-//               <div className="flex items-center justify-between mb-2">
-//                 <div className="flex items-center gap-3">
-//                   <span className={`w-3 h-3 rounded-full ${color}`} />
-//                   <span className="text-sm font-semibold text-foreground">
-//                     {name}
-//                   </span>
-//                 </div>
-//                 <div className="flex items-center gap-4">
-//                   <span className="text-xs font-medium text-muted-foreground">{pct}%</span>
-//                   <span className="text-sm font-bold text-foreground w-20 text-right">
-//                     ${amount.toLocaleString("en-US")}
-//                   </span>
-//                 </div>
-//               </div>
-//               <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-//                 <div
-//                   className={`h-full rounded-full ${color}`}
-//                   style={{ width: `${pct}%` }}
-//                 />
-//               </div>
-//             </div>
-//           ))}
-//         </div>
-//         <p className="text-[10px] font-medium text-muted-foreground mt-6 text-center">
-//           * Category breakdown is estimated. Connect analytics API for live data.
-//         </p>
-//       </div>
-//     </div>
-//   )
-// }
+        {/* Summary Cards */}
+        <div className="grid gap-4 md:grid-cols-4">
+          <SummaryCard
+            title="Total Balance"
+            value={`${formatter.format(parseFloat(summaryData.savings))}`}
+            // change="+5.2%"
+            // changeType="positive"
+            variant="light"
+            showInsights={false}
+          />
+          <SummaryCard
+            title="Monthly Income"
+            value={`${formatter.format(parseFloat(summaryData.income))}`}
+            showInsights={
+              summaryData.income_change_percentage == null ? false : true
+            }
+            change={`${summaryData.income_change_percentage}%`}
+            changeType={
+              summaryData.income_change_percentage > 0 ? "positive" : "negative"
+            }
+            variant="light"
+            icon={
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+              </svg>
+            }
+          />
+          <SummaryCard
+            title="Monthly Expenses"
+            value={
+              !summaryLoading &&
+              `${formatter.format(parseFloat(summaryData.expense))}`
+            }
+            change={`${summaryData.expense_change_percentage}%`}
+            changeType={
+              summaryData.expense_change_percentage > 0
+                ? "positive"
+                : "negative"
+            }
+            variant="light"
+            icon={
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+              </svg>
+            }
+            showInsights={
+              summaryData.expense_change_percentage == null ? false : true
+            }
+          />
+          <SummaryCard
+            title="Savings Rate"
+            value={!summaryLoading && `${summaryData.savings_rate}%`}
+            change={`${summaryData.savings_change_percentage}%`}
+            changeType={
+              summaryData.savings_change_percentage > 0
+                ? "positive"
+                : "negative"
+            }
+            variant="light"
+            icon={
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+              </svg>
+            }
+            showInsights={
+              summaryData.savings_change_percentage == null ? false : true
+            }
+          />
+        </div>
+
+        {/* CashFlow */}
+        <div className="grid gap-6 lg:grid-cols-[1.2fr_1fr]">
+          <div className="rounded-[28px] border border-border bg-card p-6 shadow-[0_16px_40px_-28px_rgba(15,23,42,0.6)]">
+            <div className="mb-2 flex items-center justify-between">
+              <div>
+                <p className="text-sm font-semibold text-muted-foreground">
+                  Cashflow
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <label
+                  htmlFor="cashflow-filter"
+                  className="text-xs text-muted-foreground"
+                >
+                  Filter by
+                </label>
+                <Select
+                  value={cashFlowParam}
+                  onValueChange={(value: "monthly" | "weekly" | "daily") => {
+                    setCashFlowParam(value)
+                  }}
+                >
+                  <SelectTrigger className="h-8 w-[100px] text-xs">
+                    <SelectValue placeholder="Filter" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem value="monthly">Monthly</SelectItem>
+                      <SelectItem value="weekly">Weekly</SelectItem>
+                      <SelectItem value="daily">Daily</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+                <label
+                  htmlFor="cashflow-type"
+                  className="text-xs text-muted-foreground"
+                >
+                  Type
+                </label>
+                <Select
+                  value={cashFlowType}
+                  onValueChange={(value: "net" | "expense" | "income") => {
+                    setCashFlowType(value)
+                  }}
+                >
+                  <SelectTrigger className="h-8 w-[100px] text-xs">
+                    <SelectValue placeholder="Type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem value="net">Net</SelectItem>
+                      <SelectItem value="expense">Expense</SelectItem>
+                      <SelectItem value="income">Income</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="mt-6 h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={cashflow} margin={{ left: 0, right: 8 }}>
+                  <defs>
+                    <linearGradient
+                      id="cashflowFill"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
+                      <stop
+                        offset="0%"
+                        stopColor="#60a5fa"
+                        stopOpacity={0.45}
+                      />
+                      <stop
+                        offset="100%"
+                        stopColor="#60a5fa"
+                        stopOpacity={0.05}
+                      />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    stroke="rgba(148,163,184,0.3)"
+                  />
+                  <XAxis
+                    dataKey="label"
+                    tickLine={false}
+                    axisLine={false}
+                    tick={{ fontSize: 12, fill: "#888888" }}
+                    minTickGap={30}
+                  />
+                  <YAxis
+                    tickLine={false}
+                    axisLine={false}
+                    tick={{ fontSize: 12, fill: "#888888" }}
+                    width={45}
+                    tickFormatter={(value) =>
+                      new Intl.NumberFormat("en-US", {
+                        notation: "compact",
+                        compactDisplay: "short",
+                      }).format(value)
+                    }
+                  />
+                  <Tooltip
+                    formatter={(value) =>
+                      `${value && formatter.format(value as number)}`
+                    }
+                    labelClassName="text-xs text-muted-foreground"
+                    contentStyle={{
+                      backgroundColor: "#0f172a",
+                      color: "#f8fafc",
+                      borderRadius: 12,
+                      border: "1px solid rgba(148,163,184,0.2)",
+                    }}
+                    itemStyle={{ color: "#60a5fa" }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey={cashFlowType}
+                    stroke="#60a5fa"
+                    strokeWidth={2}
+                    fill="url(#cashflowFill)"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          <div className="rounded-[28px] border border-border bg-card p-6 shadow-[0_16px_40px_-28px_rgba(15,23,42,0.6)]">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs font-semibold text-muted-foreground">
+                  Category Analysis
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <label
+                  htmlFor="category-filter"
+                  className="text-xs text-muted-foreground"
+                >
+                  Filter by
+                </label>
+                <Select
+                  value={categoryFilter}
+                  onValueChange={(value: "month" | "week" | "today") => {
+                    setCategoryFilter(value)
+                  }}
+                >
+                  <SelectTrigger className="h-8 w-[110px] text-xs">
+                    <SelectValue placeholder="Filter" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem value="month">This Month</SelectItem>
+                      <SelectItem value="week">This Week</SelectItem>
+                      <SelectItem value="today">Today</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="mt-6 h-72">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={categoryData}
+                  layout="vertical"
+                  margin={{ left: 10, right: 24 }}
+                >
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    horizontal={false}
+                    stroke="rgba(148,163,184,0.3)"
+                  />
+                  <XAxis
+                    type="number"
+                    tickLine={false}
+                    axisLine={false}
+                    tick={{ fontSize: 12, fill: "#888888" }}
+                    tickFormatter={(value) =>
+                      new Intl.NumberFormat("en-US", {
+                        notation: "compact",
+                        compactDisplay: "short",
+                      }).format(value)
+                    }
+                  />
+                  <YAxis
+                    type="category"
+                    dataKey="name"
+                    width={100}
+                    tickLine={false}
+                    axisLine={false}
+                    tick={{ fontSize: 12, fill: "#888888" }}
+                  />
+                  <Tooltip
+                    // formatter={(value) => `${value && formatter.format(value)}`}
+                    labelClassName="text-xs text-muted-foreground"
+                    contentStyle={{
+                      backgroundColor: "#0f172a",
+                      color: "#f8fafc",
+                      borderRadius: 12,
+                      border: "1px solid rgba(148,163,184,0.2)",
+                    }}
+                    itemStyle={{ color: "#f97316" }}
+                    cursor={{ fill: "transparent" }}
+                  />
+                  <Bar
+                    dataKey="total_amount"
+                    fill="#f97316"
+                    radius={[8, 8, 8, 8]}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  )
+}

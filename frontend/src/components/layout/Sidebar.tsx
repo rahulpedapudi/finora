@@ -3,15 +3,13 @@ import { NavLink, useNavigate } from "react-router-dom"
 import {
   LayoutDashboard,
   ArrowLeftRight,
-  // BarChart2,
+  BarChart2,
   // Target,
   Settings,
   LogOut,
   // CreditCard,
   // Lightbulb,
   // HelpCircle,
-  Sparkles,
-  Send,
   PanelLeftClose,
   PanelLeftOpen,
   // DollarSign,
@@ -25,7 +23,7 @@ const menuGroups = [
     items: [
       { to: "/dashboard", icon: LayoutDashboard, label: "Overview" },
       { to: "/transactions", icon: ArrowLeftRight, label: "Transactions" },
-      // { to: "/analytics", icon: BarChart2, label: "Analytics" },
+      { to: "/analytics", icon: BarChart2, label: "Analytics" },
     ],
   },
   // {
@@ -168,7 +166,7 @@ export default function Sidebar() {
       </nav>
 
       {/* AI Assistant section */}
-      <div
+      {/* <div
         className={`mt-auto transition-all duration-300 ${isCollapsed ? "p-2" : "p-4"}`}
       >
         {isCollapsed ? (
@@ -218,7 +216,7 @@ export default function Sidebar() {
             </div>
           </div>
         )}
-      </div>
+      </div> */}
     </aside>
   )
 }
