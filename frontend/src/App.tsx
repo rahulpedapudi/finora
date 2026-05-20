@@ -5,7 +5,7 @@ import {
   Navigate,
 } from "react-router-dom"
 import LoginPage from "./features/auth/pages/LoginPage.tsx"
-import RegisterPage from "./features/auth/pages/RegisterPage"
+import AuthCallback from "./features/auth/pages/AuthCallback.tsx"
 import ProtectedRoute from "./features/auth/components/ProtectedRoute"
 import AuthLoader from "./features/auth/components/AuthLoader.tsx"
 import AppLayout from "./components/layout/AppLayout"
@@ -23,7 +23,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/auth/callback" element={<AuthCallback />} />
           {/* All authenticated routes under AppLayout */}
           <Route element={<ProtectedRoute />}>
             <Route element={<AppLayout />}>

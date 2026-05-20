@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react"
-import { getCurrentUser } from "../api/getCurrentUser"
+import { supabase } from "@/lib/supabase/client"
 import { useAuthStore } from "../store/authStore"
+import { api } from "@/lib/axios"
 
 export default function AuthLoader({
   children,
@@ -8,29 +9,40 @@ export default function AuthLoader({
   children: React.ReactNode
 }) {
   const setUser = useAuthStore((state) => state.setUser)
-
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const loadUser = async () => {
-      // Skip the network call entirely if no token in storage
-      const token = localStorage.getItem("access_token")
-      if (!token) {
-        setLoading(false)
-        return
+    // 1. Check existing session on mount
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (session) {
+        try {
+          const res = await api.get("/auth/me")
+          setUser(res.data)
+        } catch {
+          setUser(null)
+        }
       }
+      setLoading(false)
+    })
 
-      try {
-        const user = await getCurrentUser()
-        setUser(user)
-      } catch (error) {
+    // 2. Listen for auth state changes (login, logout, token refresh)
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (session) {
+        try {
+          const res = await api.get("/auth/me")
+          setUser(res.data)
+        } catch {
+          setUser(null)
+        }
+      } else {
         setUser(null)
-      } finally {
-        setLoading(false)
       }
-    }
-    loadUser()
-  }, [])
+    })
+
+    return () => subscription.unsubscribe()
+  }, [setUser])
 
   if (loading)
     return (

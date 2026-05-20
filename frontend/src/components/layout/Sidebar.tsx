@@ -15,7 +15,7 @@ import {
   // DollarSign,
 } from "lucide-react"
 import { useAuthStore } from "@/features/auth/store/authStore"
-import { logout } from "@/features/auth/api/logout"
+import { supabase } from "@/lib/supabase/client"
 
 const menuGroups = [
   {
@@ -49,9 +49,7 @@ export default function Sidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false)
 
   const handleLogout = async () => {
-    try {
-      await logout()
-    } catch {}
+    await supabase.auth.signOut()
     logoutStore()
     navigate("/login")
   }

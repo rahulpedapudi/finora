@@ -23,8 +23,8 @@ export default function HomePage() {
             </p>
 
             <div className="flex flex-wrap items-center gap-4">
-              <Button size="lg" onClick={() => navigate("/register")}>
-                Create account
+              <Button size="lg" onClick={() => navigate("/login")}>
+                Get started
               </Button>
               <Button
                 size="lg"

@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom"
 import { useAuthStore } from "@/features/auth/store/authStore"
 import { useTheme } from "@/components/theme-provider"
-import { logout } from "@/features/auth/api/logout"
+import { supabase } from "@/lib/supabase/client"
 import { Separator } from "@/components/ui/separator"
 import { LogOut, Moon, Sun, User, Shield, Bell } from "lucide-react"
 
@@ -12,7 +12,7 @@ export default function Settings() {
   const navigate = useNavigate()
 
   const handleLogout = async () => {
-    try { await logout() } catch {}
+    await supabase.auth.signOut()
     logoutStore()
     navigate("/login")
   }
