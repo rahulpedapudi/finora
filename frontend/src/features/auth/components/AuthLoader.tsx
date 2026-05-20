@@ -12,36 +12,77 @@ export default function AuthLoader({
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // 1. Check existing session on mount
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (session) {
-        try {
-          const res = await api.get("/auth/me")
-          setUser(res.data)
-        } catch {
+    let mounted = true
+    let subscription: { unsubscribe: () => void } | null = null
+
+    async function initAuth() {
+      try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession()
+
+        if (session && mounted) {
+          try {
+            const res = await api.get("/auth/me")
+            if (mounted) {
+              setUser(res.data)
+            }
+          } catch (error) {
+            console.error("AuthLoader: failed to fetch profile on mount", error)
+            if (mounted) {
+              setUser(null)
+            }
+          }
+        } else if (mounted) {
           setUser(null)
         }
-      }
-      setLoading(false)
-    })
-
-    // 2. Listen for auth state changes (login, logout, token refresh)
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      if (session) {
-        try {
-          const res = await api.get("/auth/me")
-          setUser(res.data)
-        } catch {
+      } catch (error) {
+        console.error("AuthLoader: getSession failed on mount", error)
+        if (mounted) {
           setUser(null)
         }
-      } else {
-        setUser(null)
+      } finally {
+        if (mounted) {
+          setLoading(false)
+        }
       }
-    })
 
-    return () => subscription.unsubscribe()
+      // 2. Listen for subsequent auth state changes (login, logout, token refresh)
+      if (mounted) {
+        const {
+          data: { subscription: sub },
+        } = supabase.auth.onAuthStateChange(async (event, session) => {
+          // Ignore the initial session event since we already handled it on mount
+          if (event === "INITIAL_SESSION") return
+
+          if (session) {
+            try {
+              const res = await api.get("/auth/me")
+              if (mounted) {
+                setUser(res.data)
+              }
+            } catch (error) {
+              console.error("AuthLoader: onAuthStateChange get profile failed", error)
+              if (mounted) {
+                setUser(null)
+              }
+            }
+          } else if (mounted) {
+            setUser(null)
+          }
+        })
+        subscription = sub
+      }
+    }
+
+    initAuth()
+
+    return () => {
+      mounted = false
+      if (subscription) {
+        subscription.unsubscribe()
+      }
+    }
   }, [setUser])
 
   if (loading)

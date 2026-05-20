@@ -28,7 +28,9 @@ api.interceptors.response.use(
   async (error) => {
     if (error.response?.status === 401) {
       useAuthStore.getState().logout()
-      await supabase.auth.signOut()
+      supabase.auth.signOut().catch((err) => {
+        console.error("SignOut error in response interceptor:", err)
+      })
     }
     return Promise.reject(error)
   }
