@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 import os
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.routes import transactions
@@ -53,6 +53,6 @@ app.include_router(router=categories.router,
                    prefix="/category", tags=["Categories"])
 
 
-@app.get("/")
+@app.head("/")
 def test():
-    return {"message": "finora api"}
+    return Response(status_code=200)
