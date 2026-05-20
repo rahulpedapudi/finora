@@ -36,7 +36,7 @@ def get_transaction(
         db: Session = Depends(get_db),
         user: User = Depends(get_current_user)
 ):
-    return transaction_service.get_transaction_by_id(txn_id, db.user)
+    return transaction_service.get_transaction_by_id(txn_id, db, user)
 
 
 @router.delete("/{txn_id}")

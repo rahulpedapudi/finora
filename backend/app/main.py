@@ -3,7 +3,6 @@ import os
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.routes import transactions
 from app.api.routes import auth
-from app.api.routes import profile
 from app.api.routes import categories
 from app.api.routes import analytics
 
@@ -29,7 +28,7 @@ FRONTEND_URL = os.getenv("FRONTEND_URL")
 app.add_middleware(
     CORSMiddleware,
     # Allows specific origins (use ["*"] for all)
-    allow_origins=[FRONTEND_URL],
+    allow_origins=[FRONTEND_URL, "http://localhost:5173"],
     allow_credentials=True,  # Allows cookies and authentication headers
     # Allows all HTTP methods (GET, POST, etc.)
     allow_methods=["*"],
@@ -50,8 +49,6 @@ app.include_router(
 
 app.include_router(router=auth.router, prefix="/auth", tags=["Auth"])
 
-app.include_router(router=profile.router,
-                   prefix="/profile", tags=["Profile"])
 app.include_router(router=categories.router,
                    prefix="/category", tags=["Categories"])
 

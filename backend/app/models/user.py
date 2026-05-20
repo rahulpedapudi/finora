@@ -14,9 +14,10 @@ class User(Base):
         primary_key=True,
         default=uuid.uuid4)
 
+    supabase_id = Column(String, unique=True, index=True, nullable=True)
     email = Column(String, unique=True, nullable=False)
     name = Column(String)
-    password_hash = Column(String)
+    password_hash = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.now(UTC))
 
     transactions = relationship("Transaction", back_populates="user")
