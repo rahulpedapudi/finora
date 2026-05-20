@@ -24,7 +24,7 @@ export const useTransactionState = create<TransactionStore>((set) => ({
   data: [],
 
   fetchTransactions: async () => {
-    const res = await api.get("/transactions")
+    const res = await api.get("/transactions/")
     set({ data: res.data })
   },
 }))

@@ -25,7 +25,7 @@ export const useTransactions = () => {
         params.append("cursor_created_at", pageParam.cursor_created_at)
       }
 
-      const response = await api.get(`/transactions?${params.toString()}`)
+      const response = await api.get(`/transactions/?${params.toString()}`)
 
       return response.data
     },
